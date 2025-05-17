@@ -1,7 +1,9 @@
 import axios from "axios";
 
+const API_BASE = process.env.REACT_APP_API_BASE_URL || "http://localhost:8080/api";
+
 const instance = axios.create({
-    baseURL: process.env.REACT_APP_API_BASE_URL || "http://localhost:8080/api",
+    baseURL: API_BASE,
 });
 
 instance.interceptors.request.use((config) => {
@@ -12,4 +14,4 @@ instance.interceptors.request.use((config) => {
     return config;
 });
 
-export default instance;
+export {instance, API_BASE};
