@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { register } from "../api/auth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 function Register() {
     const [form, setForm] = useState({ username: "", password: "", email: ""});
@@ -55,11 +55,17 @@ function Register() {
                 {error && <p className="text-red-600 mb-2">{error}</p>}
                 <button
                     type="submit"
-                    className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700"
+                    className="w-full bg-cyan-500 text-white py-2 rounded hover:bg-cyan-700"
                 >
                     Sign Up
                 </button>
             </form>
+            <div className="mt-4 text-center">
+                <span className="text-gray-700">Already have an account?</span>{" "}
+                <Link to="/login" className="text-teal-700 hover:text-cyan-500 font-medium">
+                    Sign in
+                </Link>
+            </div>
         </div>
     );
 }

@@ -8,10 +8,10 @@ function Navbar() {
     const { user, logout } = useContext(AuthContext);
 
     return (
-        <header className="py-3 sticky top-0 z-10 bg-[#131921] text-white shadow-md">
+        <header className="py-3 sticky top-0 z-10 bg-gray-900 text-white shadow-md">
             <div className="container mx-auto flex justify-between items-center px-4">
                 {/* Logo with Shop Icon */}
-                <Link to="/" className="text-3xl font-bold flex items-center text-orange-400">
+                <Link to="/" className="text-3xl font-bold flex items-center text-cyan-500">
                     <FaStore className="text-3xl mr-2" />
                     <span className="text-xl">
                         <span>E</span>
@@ -26,7 +26,7 @@ function Navbar() {
                     <Link to="/cart" className="nav-link relative">
                         <FaShoppingCart className="text-2xl" />
                         {/* Replace 3 with dynamic cart count if available */}
-                        <span className="cart-count absolute -top-2 -right-2 rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold bg-[#ff9900] text-[#111827]">
+                        <span className="cart-count absolute -top-2 -right-2 rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold bg-cyan-500 text-gray-900">
                             3
                         </span>
                     </Link>

@@ -1,6 +1,6 @@
 import { useState, useContext } from "react";
 import { login } from "../api/auth";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 
 function Login() {
@@ -44,11 +44,17 @@ function Login() {
                 {error && <p className="text-red-600 mb-2">{error}</p>}
                 <button
                     type="submit"
-                    className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700"
+                    className="w-full bg-cyan-500 text-white py-2 rounded hover:bg-cyan-700"
                 >
                     Login
                 </button>
             </form>
+            <div className="mt-4 text-center">
+                <span className="text-gray-700">Don't have an account?</span>{" "}
+                <Link to="/register" className="text-teal-700 hover:text-cyan-500 font-medium">
+                    Sign up
+                </Link>
+            </div>
         </div>
     );
 }

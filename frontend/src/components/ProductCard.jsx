@@ -15,7 +15,7 @@ function ProductCard({ product }) {
 
             <h3 className="text-lg font-semibold mb-1">{product.name}</h3>
             <p className="text-gray-600 mb-2">${product.price.toFixed(2)}</p>
-            <Link to={`/products/${product.id}`}  className="text-blue-600 hover:underline">
+            <Link to={`/products/${product.id}`}  className="text-cyan-500 hover:underline">
                 View Details
             </Link>
         </div>
