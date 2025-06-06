@@ -1,4 +1,3 @@
-// src/hooks/UseProducts.jsx
 import { useEffect, useState } from 'react';
 import {getProducts} from "../api/products";
 
