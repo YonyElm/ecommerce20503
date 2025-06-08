@@ -4,3 +4,7 @@ import {API_BASE} from "./axios";
 export async function getProducts() {
     return axios.get(`${API_BASE}/products`, {});
 }
+
+export async function getProductById(id) {
+    return axios.get(`${API_BASE}/products/${id}`, {});
+}

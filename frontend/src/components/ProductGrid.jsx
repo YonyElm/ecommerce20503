@@ -4,7 +4,7 @@ import ProductContext from '../context/ProductContext';
 import Spinner from './Spinner';
 
 function ProductGrid() {
-    let { products, loading: isLoading } = ProductContext();
+    const { products, loading: isLoading } = ProductContext();
 
     if (isLoading) {
         return (

@@ -1,4 +1,3 @@
-// src/components/Navbar.jsx
 import { useContext } from "react";
 import { AuthContext } from "../context/AuthContext";
 import { Link } from "react-router-dom";
@@ -23,16 +22,15 @@ function Navbar() {
                 {/* Navigation */}
                 <nav className="flex items-center space-x-6">
                     {/* Cart */}
-                    <Link to="/cart" className="nav-link relative">
+                    <Link to="/cart" className="relative">
                         <FaShoppingCart className="text-2xl" />
-                        {/* Replace 3 with dynamic cart count if available */}
-                        <span className="cart-count absolute -top-2 -right-2 rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold bg-cyan-500 text-gray-900">
+                        <span className="absolute -top-2 -right-2 rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold bg-cyan-500 text-gray-900">
                             3
                         </span>
                     </Link>
 
                     {/* Account Info */}
-                    <div className="nav-link text-sm cursor-pointer">
+                    <div className="text-sm cursor-pointer">
                         <div className="text-xs">
                             {user ? `Hello, ${user.email}` : "Hello, Sign In"}
                         </div>
@@ -51,7 +49,7 @@ function Navbar() {
                     </div>
 
                     {/* Orders */}
-                    <Link to="/orders" className="nav-link text-sm">
+                    <Link to="/orders" className="text-sm">
                         <div className="text-xs">Returns</div>
                         <div className="font-bold">& Orders</div>
                     </Link>
