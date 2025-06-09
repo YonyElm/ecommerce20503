@@ -3,7 +3,7 @@ import Spinner from "../components/Spinner";
 import {ChosenQuantityContext, DetailPageContext} from "../context/DetailPageContext";
 
 const DetailPage = () => {
-  const {product, isLoading, maxQuantity} = DetailPageContext();
+  const {product, isLoading} = DetailPageContext();
   const [chosenQuantity, handleChosenQuantityChange] = ChosenQuantityContext();
 
   if (isLoading) {
@@ -16,9 +16,7 @@ const DetailPage = () => {
 
     if (!product) {
         return (
-            <div className="flex justify-center items-center min-h-screen bg-gray-100">
-                <div className="text-xl font-bold text-red-600">Product Not Found</div>
-            </div>
+            <div className="text-center text-gray-500">No product found.</div>
         );
     }
 
@@ -30,8 +28,8 @@ const DetailPage = () => {
         alert(`Proceeding to buy ${chosenQuantity} ${product.name}(s)!`);
     };
 
-    const inStock = product.inventory && product.inventory.quantity > 0;
-    const categoryName = product.category ? product.category.name : "N/A";
+    const inStock = product.maxQuantity > 0;
+    const categoryName = product.categoryName ? product.categoryName : "N/A";
 
     return (
         <main className="container mx-auto mt-24 px-4">
@@ -78,7 +76,7 @@ const DetailPage = () => {
                     <div className="mb-4">
                         <span className="text-gray-700 font-semibold">Availability:</span>
                         {inStock ? (
-                            <span className="text-green-600"> In Stock ({product.inventory.quantity} left)</span>
+                            <span className="text-green-600"> In Stock ({product.maxQuantity} left)</span>
                         ) : (
                             <span className="text-red-600"> Out of Stock</span>
                         )}
@@ -95,7 +93,7 @@ const DetailPage = () => {
                             value={chosenQuantity}
                             onChange={handleChosenQuantityChange}
                             min="1"
-                            max={maxQuantity}
+                            max={product.maxQuantity}
                             className={`border rounded py-1 px-2 w-16 text-center 
                     ${!inStock ? "bg-gray-100 text-gray-400 cursor-not-allowed" : ""}`}
                             // disabled={!inStock}

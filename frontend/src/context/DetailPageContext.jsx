@@ -1,15 +1,14 @@
 import {useCallback, useEffect, useState} from 'react';
-import {getProductById} from "../api/products";
+import {getProductDetailsById} from "../api/products";
 import {useParams} from "react-router-dom";
 
 const DetailPageContext = () => {
     const { productID } = useParams();
     const [product, setProduct] = useState(null);
     const [isLoading, setLoading] = useState(true);
-    const [maxQuantity, setMaxQuantity] = useState(1);
 
     useEffect(() => {
-        getProductById(productID)
+        getProductDetailsById(productID)
             .then((res) => {
                 setProduct(res.data);
                 setLoading(false);
@@ -18,11 +17,9 @@ const DetailPageContext = () => {
                 console.error('Error loading categories', err);
                 setLoading(false);
             });
-        //getQuantityByIdd(productID)
-        setMaxQuantity(5);
     }, [productID]);
 
-    return { product, isLoading, maxQuantity};
+    return { product, isLoading};
 };
 
 const ChosenQuantityContext = () => {
