@@ -2,13 +2,14 @@ package com.example.backend.controller;
 
 import com.example.backend.model.Product;
 import com.example.backend.dao.ProductDAO;
+import com.example.backend.service.DetailPageService;
+import com.example.backend.viewModel.DetailPageViewModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.BindingResult;
 import org.springframework.http.ResponseEntity;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
-
 
 import java.util.List;
 
@@ -17,10 +18,12 @@ import java.util.List;
 public class ProductController {
 
     private final ProductDAO productDAO;
+    private final DetailPageService detailPageService;
 
     @Autowired
-    public ProductController(ProductDAO productDAO) {
+    public ProductController(ProductDAO productDAO, DetailPageService detailPageService) {
         this.productDAO = productDAO;
+        this.detailPageService = detailPageService;
     }
 
     @GetMapping
@@ -38,8 +41,8 @@ public class ProductController {
     }
 
     @GetMapping("/{id}")
-    public Product getProductById(@PathVariable int id) {
-        return productDAO.getProductById(id);
+    public ResponseEntity<?> getProductById(@PathVariable int id) {
+        return ResponseEntity.status(HttpStatus.OK).body(detailPageService.getProductDetailById(id));
     }
 
     @GetMapping("/category/{categoryId}")

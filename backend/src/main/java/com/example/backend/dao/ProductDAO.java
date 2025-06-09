@@ -8,8 +8,6 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
 
-import java.math.BigDecimal;
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -18,24 +16,35 @@ import java.util.stream.Collectors;
 public class ProductDAO {
 
     private final JdbcTemplate jdbcTemplate;
-    private CategoryDAO categoryDAO;
+    private final CategoryDAO categoryDAO;
+    private final RowMapper<Product> productRowMapper;
 
     @Autowired
     public ProductDAO(@NotNull JdbcTemplate jdbcTemplate,@NotNull CategoryDAO categoryDAO) {
         this.jdbcTemplate = jdbcTemplate;
         this.categoryDAO = categoryDAO;
+        this.productRowMapper = createProductRowMapper();
     }
 
-    private RowMapper<Product> productRowMapper = (rs, rowNum) -> {
-        int id = rs.getInt("id");
-        String name = rs.getString("name");
-        String description = rs.getString("description");
-        BigDecimal price = rs.getBigDecimal("price");
-        int categoryId = rs.getInt("category_id");
-        Category category = categoryDAO.getCategoryById(categoryId);
-        Timestamp createdAt = rs.getTimestamp("created_at");
-        return new Product(id, name, description, price, category, createdAt);
-    };
+    private RowMapper<Product> createProductRowMapper() {
+        return (rs, rowNum) -> {
+            int categoryId = rs.getInt("category_id");
+            Category category = null;
+
+            if (!rs.wasNull()) { // Only attempt to fetch category if the column wasn't NULL
+                category = categoryDAO.getCategoryById(categoryId);
+            }
+
+            return new Product(
+                rs.getInt("id"),
+                rs.getString("name"),
+                rs.getString("description"),
+                rs.getBigDecimal("price"),
+                category,
+                rs.getTimestamp("created_at")
+            );
+        };
+    }
 
     // Get all products
     public List<Product> getAllProducts() {
@@ -48,11 +57,10 @@ public class ProductDAO {
     // Get a product by ID
     public Product getProductById(int id) {
         String sql = "SELECT * FROM products WHERE id = ?";
-        try {
-            return jdbcTemplate.queryForObject(sql, new Object[]{id}, productRowMapper);
-        } catch (org.springframework.dao.EmptyResultDataAccessException e) {
-            return null;
-        }
+        return jdbcTemplate.query(sql, productRowMapper, id)
+                .stream()
+                .findFirst()
+                .orElse(null);
     }
 
     // Add a new product
@@ -62,16 +70,17 @@ public class ProductDAO {
                 product.getName(),
                 product.getDescription(),
                 product.getPrice(),
-                product.getCategory().getId() // Use the ID from the Category object
+                product.getCategory().getId()
         }, Integer.class);
 
         product.setId(id);
         return product;
     }
 
+    // Get products by category
     public List<Product> getProductsByCategory(int categoryId) {
-        return jdbcTemplate.query("SELECT * FROM products WHERE category_id = ?", productRowMapper, categoryId)
-                .stream()
+        String sql = "SELECT * FROM products WHERE category_id = ?";
+        return jdbcTemplate.query(sql, productRowMapper, categoryId).stream()
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
