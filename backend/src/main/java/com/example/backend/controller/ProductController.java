@@ -3,7 +3,6 @@ package com.example.backend.controller;
 import com.example.backend.model.Product;
 import com.example.backend.dao.ProductDAO;
 import com.example.backend.service.DetailPageService;
-import com.example.backend.viewModel.DetailPageViewModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.BindingResult;

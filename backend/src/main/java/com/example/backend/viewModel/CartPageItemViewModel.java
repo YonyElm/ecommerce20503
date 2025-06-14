@@ -7,11 +7,10 @@ import java.math.BigDecimal;
 
 @Getter
 @Setter
-public class DetailPageViewModel {
-    private int id;
+public class CartPageItemViewModel {
+    private Integer id;
     private String name;
-    private String description;
     private BigDecimal price;
-    private String categoryName;
-    private Integer maxQuantity;
+    private Integer quantity;
+    // private String image id
 }

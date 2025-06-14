@@ -32,6 +32,7 @@ public class DetailPageService {
 
         // Assemble view model
         DetailPageViewModel viewModel = new DetailPageViewModel();
+        viewModel.setId(product.getId());
         viewModel.setName(product.getName());
         viewModel.setDescription(product.getDescription());
         viewModel.setPrice(product.getPrice());
