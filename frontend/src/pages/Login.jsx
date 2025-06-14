@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import {useState, useContext, useEffect} from "react";
 import { login } from "../api/auth";
 import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
@@ -9,6 +9,13 @@ function Login() {
     const [error, setError] = useState(null);
     const navigate = useNavigate();
     const authContext = useContext(AuthContext);
+
+    // When logged in, login page redirects to home page
+    useEffect(() => {
+        if (authContext.user) {
+            navigate("/");
+        }
+    }, [authContext.user, navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();

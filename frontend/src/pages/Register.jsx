@@ -1,11 +1,20 @@
-import { useState } from "react";
+import {useContext, useEffect, useState} from "react";
 import { register } from "../api/auth";
 import { useNavigate, Link } from "react-router-dom";
+import {AuthContext} from "../context/AuthContext";
 
 function Register() {
     const [form, setForm] = useState({ username: "", password: "", email: ""});
     const [error, setError] = useState(null);
     const navigate = useNavigate();
+    const authContext = useContext(AuthContext);
+
+    // When logged in, register page redirects to home page
+    useEffect(() => {
+        if (authContext.user) {
+            navigate("/");
+        }
+    }, [authContext.user, navigate]);
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });

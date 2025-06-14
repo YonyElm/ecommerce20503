@@ -1,10 +1,19 @@
 import { useContext } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
-import { Link } from "react-router-dom";
+import { CartContext } from "../context/CartContext";
 import { FaStore, FaShoppingCart } from "react-icons/fa";
 
 function Navbar() {
     const { user, logout } = useContext(AuthContext);
+    const { cartItems } = useContext(CartContext);
+    const navigate = useNavigate();
+
+    // Logout + Route Home
+    const handleLogout = () => {
+        logout();
+        navigate("/");
+    };
 
     return (
         <header className="py-3 sticky top-0 z-10 bg-gray-900 text-white shadow-md">
@@ -22,22 +31,22 @@ function Navbar() {
                 {/* Navigation */}
                 <nav className="flex items-center space-x-6">
                     {/* Cart */}
-                    <Link to="/cart" className="relative">
+                    <Link to={user ? "/cart" : "/login"} className="relative">
                         <FaShoppingCart className="text-2xl" />
                         <span className="absolute -top-2 -right-2 rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold bg-cyan-500 text-gray-900">
-                            3
+                            {user && cartItems?.length ? cartItems?.length : 0}
                         </span>
                     </Link>
 
                     {/* Account Info */}
                     <div className="text-sm cursor-pointer">
                         <div className="text-xs">
-                            {user ? `Hello, ${user.email}` : "Hello, Sign In"}
+                            {user && user.email ? `Hello, ${user.email}` : "Hello, Sign In"}
                         </div>
                         {user ? (
                             <button
                                 className="font-bold text-left focus:outline-none"
-                                onClick={logout}
+                                onClick={handleLogout}
                             >
                                 Logout
                             </button>
@@ -49,7 +58,7 @@ function Navbar() {
                     </div>
 
                     {/* Orders */}
-                    <Link to="/orders" className="text-sm">
+                    <Link to={user ? "/orders" : "/login"} className="text-sm">
                         <div className="text-xs">Returns</div>
                         <div className="font-bold">& Orders</div>
                     </Link>

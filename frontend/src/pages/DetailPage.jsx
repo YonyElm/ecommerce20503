@@ -1,12 +1,17 @@
-import React from "react";
+import React, { useContext } from "react";
+import { Link } from "react-router-dom";
 import Spinner from "../components/Spinner";
 import {ChosenQuantityContext, DetailPageContext} from "../context/DetailPageContext";
+import { AuthContext } from "../context/AuthContext";
+import {CartContext} from "../context/CartContext";
 
 const DetailPage = () => {
-  const {product, isLoading} = DetailPageContext();
-  const [chosenQuantity, handleChosenQuantityChange] = ChosenQuantityContext();
+    const { product, isLoading } = DetailPageContext();
+    const [chosenQuantity, handleChosenQuantityChange] = ChosenQuantityContext();
+    const { user: isSignedIn} = useContext(AuthContext);
+    const {cartItems, addItem, updateQuantity} = useContext(CartContext);
 
-  if (isLoading) {
+    if (isLoading) {
         return (
             <div className="flex justify-center items-center h-64">
                 <Spinner />
@@ -21,6 +26,13 @@ const DetailPage = () => {
     }
 
     const addToCart = () => {
+        if (cartItems.some(item => item.id === product.id)) {
+            updateQuantity(product.id, chosenQuantity);
+        } else {
+            let item = {id: product.id, name: product.name,
+                price: product.price, quantity: chosenQuantity};
+            addItem(item);
+        }
         alert(`Added ${chosenQuantity} ${product.name}(s) to cart!`);
     };
 
@@ -95,34 +107,49 @@ const DetailPage = () => {
                             min="1"
                             max={product.maxQuantity}
                             className={`border rounded py-1 px-2 w-16 text-center 
-                    ${!inStock ? "bg-gray-100 text-gray-400 cursor-not-allowed" : ""}`}
-                            // disabled={!inStock}
+                                ${!inStock ? "bg-gray-100 text-gray-400 cursor-not-allowed" : ""}`}
+                            disabled={!inStock || !isSignedIn}
                         />
                     </div>
 
                     <div className="flex gap-4">
                         <button
                             className={`w-full py-2 rounded font-semibold 
-                    ${inStock
-                                ? "bg-cyan-500 text-white hover:bg-cyan-700"
-                                : "bg-gray-300 text-gray-500 cursor-not-allowed"}`}
-                            disabled={!inStock}
+                                ${
+                                    inStock && isSignedIn
+                                        ? "bg-cyan-500 text-white hover:bg-cyan-700"
+                                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                }`}
+                            disabled={!inStock || !isSignedIn}
                             onClick={addToCart}
                         >
                             Add to Cart
                         </button>
                         <button
                             className={`w-full py-2 rounded font-semibold 
-                    ${inStock
-                                ? "bg-cyan-500 text-white hover:bg-cyan-700"
-                                : "bg-gray-300 text-gray-500 cursor-not-allowed"}`}
-                            disabled={!inStock}
+                                ${
+                                    inStock && isSignedIn
+                                        ? "bg-cyan-500 text-white hover:bg-cyan-700"
+                                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                                }`}
+                            disabled={!inStock || !isSignedIn}
                             onClick={buyNow}
                         >
                             Buy Now
                         </button>
                     </div>
 
+                    {!isSignedIn ?
+                        <p className="mt-6 text-center text-m text-gray-700">
+                            Please{" "}
+                            <Link to="/login" className="text-cyan-500 underline font-medium hover:text-cyan-700">
+                                sign in
+                            </Link>{" "}
+                            to purchase or add items to your cart.
+                        </p>
+                        :
+                        <div></div>
+                    }
                 </div>
             </div>
         </main>
