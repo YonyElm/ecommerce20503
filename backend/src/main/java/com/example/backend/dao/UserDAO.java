@@ -17,18 +17,18 @@ public class UserDAO {
     }
 
     public void registerUser(User user) {
-        String sql = "INSERT INTO users (username, password_hash, email, full_name) VALUES (?, ?, ?, ?)";
-        jdbcTemplate.update(sql, user.getUsername(), user.getPasswordHash(), user.getEmail(), user.getFullName());
+        String sql = "INSERT INTO users (email, password_hash, full_name) VALUES (?, ?, ?)";
+        jdbcTemplate.update(sql, user.getEmail(), user.getPasswordHash(), user.getFullName());
     }
 
-    public User findByUsername(String username) {
-        String sql = "SELECT * FROM users WHERE username = ?";
-        return jdbcTemplate.queryForObject(sql, new BeanPropertyRowMapper<>(User.class), username);
+    public User findByEmail(String email) {
+        String sql = "SELECT * FROM users WHERE email = ?";
+        return jdbcTemplate.queryForObject(sql, new BeanPropertyRowMapper<>(User.class), email);
     }
 
-    public boolean existsByUsername(String username) {
-        String sql = "SELECT COUNT(*) FROM users WHERE username = ?";
-        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, username);
+    public boolean existsByEmail(String email) {
+        String sql = "SELECT COUNT(*) FROM users WHERE email = ?";
+        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, email);
         return count > 0;
     }
 }

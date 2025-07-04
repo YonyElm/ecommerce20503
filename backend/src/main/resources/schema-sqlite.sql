@@ -1,9 +1,8 @@
 -- USERS TABLE
 CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    username TEXT UNIQUE NOT NULL,
-    password_hash TEXT NOT NULL,
     email TEXT UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
     full_name TEXT,
     registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     is_active BOOLEAN DEFAULT 1
@@ -27,8 +26,9 @@ CREATE TABLE IF NOT EXISTS user_roles (
 -- CATEGORIES TABLE
 CREATE TABLE IF NOT EXISTS categories (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT NOT NULL,
-    description TEXT
+    name TEXT UNIQUE NOT NULL,
+    description TEXT,
+    is_active BOOLEAN DEFAULT 1
 );
 
 -- PRODUCTS TABLE
@@ -39,6 +39,7 @@ CREATE TABLE IF NOT EXISTS products (
     price REAL NOT NULL,
     category_id INTEGER,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    is_active BOOLEAN DEFAULT 1,
     FOREIGN KEY (category_id) REFERENCES categories(id)
 );
 
@@ -64,8 +65,33 @@ CREATE TABLE IF NOT EXISTS cart_items (
     cart_id INTEGER,
     product_id INTEGER,
     quantity INTEGER NOT NULL,
+    is_active BOOLEAN DEFAULT 1,
     FOREIGN KEY (cart_id) REFERENCES shopping_cart(id),
     FOREIGN KEY (product_id) REFERENCES products(id)
+);
+
+-- PAYMENTS TABLE
+CREATE TABLE IF NOT EXISTS payments (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    name TEXT NOT NULL,
+    is_active BOOLEAN DEFAULT 1,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);
+
+-- ADDRESSES TABLE
+CREATE TABLE IF NOT EXISTS addresses (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id INTEGER,
+    full_name TEXT NOT NULL,
+    address_line1 TEXT NOT NULL,
+    address_line2 TEXT,
+    city TEXT NOT NULL,
+    postal_code TEXT NOT NULL,
+    country TEXT NOT NULL,
+    phone_number TEXT,
+    is_active BOOLEAN DEFAULT 1,
+    FOREIGN KEY (user_id) REFERENCES users(id)
 );
 
 -- ORDERS TABLE
@@ -74,8 +100,11 @@ CREATE TABLE IF NOT EXISTS orders (
     user_id INTEGER,
     order_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     total_amount REAL NOT NULL,
-    status TEXT DEFAULT 'PENDING',
-    FOREIGN KEY (user_id) REFERENCES users(id)
+    address_id INTEGER NOT NULL,
+    payment_id INTEGER NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id),
+    FOREIGN KEY (address_id) REFERENCES addresses(id),
+    FOREIGN KEY (payment_id) REFERENCES payments(id)
 );
 
 -- ORDER ITEMS TABLE

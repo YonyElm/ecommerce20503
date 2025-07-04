@@ -17,14 +17,11 @@ public class User {
     private int id;
 
     @Column(unique = true, nullable = false)
-    private String username;
+    private String email;
 
     @Column(nullable = false, name = "password_hash")
     @JsonProperty("password")
     private String passwordHash;
-
-    @Column(unique = true, nullable = false)
-    private String email;
 
     @Column(name = "full_name")
     private String fullName;
@@ -38,11 +35,10 @@ public class User {
     // Used for JPA bean injection
     public User() {}
 
-    public User(int id, String username, String passwordHash, String email, String fullName, Timestamp registeredAt, boolean isActive) {
+    public User(int id, String email, String passwordHash, String fullName, Timestamp registeredAt, boolean isActive) {
         this.id = id;
-        this.username = username;
-        this.passwordHash = passwordHash;
         this.email = email;
+        this.passwordHash = passwordHash;
         this.fullName = fullName;
         this.registeredAt = registeredAt;
         this.isActive = isActive;

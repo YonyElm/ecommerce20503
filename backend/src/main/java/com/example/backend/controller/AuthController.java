@@ -33,7 +33,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody User user) {
-        if (userDAO.existsByUsername(user.getUsername())) {
+        if (userDAO.existsByEmail(user.getEmail())) {
             return ResponseEntity.badRequest().body("Username already taken");
         }
 
@@ -41,7 +41,7 @@ public class AuthController {
         userDAO.registerUser(user);
 
         // Assign default CUSTOMER role
-        int userId = userDAO.findByUsername(user.getUsername()).getId();
+        int userId = userDAO.findByEmail(user.getEmail()).getId();
         Role customerRole = roleDAO.findByName("CUSTOMER");
         roleDAO.assignRoleToUser(userId, customerRole.getId());
 
@@ -51,7 +51,7 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> loginData) {
         try {
-            User user = userDAO.findByUsername(loginData.get("username"));
+            User user = userDAO.findByEmail(loginData.get("email"));
             if (PasswordEncoderUtil.matches(loginData.get("password"), user.getPasswordHash())) {
                 // Fetch roles of the user
                 List<Role> userRoles = roleDAO.getUserRoles(user.getId());
@@ -60,7 +60,7 @@ public class AuthController {
                         .collect(Collectors.toList());
 
                 // Generate JWT
-                String token = JwtUtil.generateToken(user.getId(), user.getUsername(), roleNames);
+                String token = JwtUtil.generateToken(user.getId(), user.getEmail(), roleNames);
                 return ResponseEntity.ok(Map.of("token", token));
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");

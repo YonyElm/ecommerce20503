@@ -46,14 +46,14 @@ public class AuthControllerTest {
 
     @Test
     void testRegisterUser() throws Exception {
-        User user = new User(1, "testuser", "password123", "test@example.com"
+        User user = new User(1, "test@example.com", "password123"
                 , "Test User", new Timestamp(System.currentTimeMillis()), true);
         Role customerRole = new Role("CUSTOMER");
 
         customerRole.setId(1);
-        when(userDAO.existsByUsername(user.getUsername())).thenReturn(false);
+        when(userDAO.existsByEmail(user.getEmail())).thenReturn(false);
         doNothing().when(userDAO).registerUser(user);
-        when(userDAO.findByUsername(user.getUsername())).thenReturn(user);
+        when(userDAO.findByEmail(user.getEmail())).thenReturn(user);
         when(roleDAO.findByName("CUSTOMER")).thenReturn(customerRole);
 
         doNothing().when(roleDAO).assignRoleToUser(user.getId(), customerRole.getId());
@@ -66,7 +66,7 @@ public class AuthControllerTest {
 
     @Test
     void testLoginSuccess() throws Exception {
-        User user = new User(1, "loginuser", null, "test@example.com"
+        User user = new User(1, "test@example.com", null
                 , "Test User", new Timestamp(System.currentTimeMillis()), true);
 
         // Use BCryptPasswordEncoder to hash the password
@@ -74,22 +74,20 @@ public class AuthControllerTest {
         String correctPasswordHash = passwordEncoder.encode("password123"); // Hash the correct password
         user.setPasswordHash(correctPasswordHash);
 
-        System.out.println("admin: " + passwordEncoder.encode("admin"));
-        System.out.println("john_doe: " + passwordEncoder.encode("john_doe"));
-
-        when(userDAO.findByUsername(any())).thenReturn(user);
+        // Mock that email exists
+        when(userDAO.findByEmail(any())).thenReturn(user);
 
         // try login
         mockMvc.perform(post("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"username\": \"loginuser\", \"password\": \"password123\"}"))
+                .content("{\"email\": \"test@example.com\", \"password\": \"password123\"}"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON));
     }
 
     @Test
     void testLoginFailure() throws Exception {
-        User user = new User(1, "loginuser", null, "test@example.com"
+        User user = new User(1, "test@example.com", null
                 , "Test User", new Timestamp(System.currentTimeMillis()), true);
 
         // Use BCryptPasswordEncoder to hash the password
@@ -97,11 +95,12 @@ public class AuthControllerTest {
         String correctPasswordHash = passwordEncoder.encode("wrongPassword");
         user.setPasswordHash(correctPasswordHash);
 
-        when(userDAO.findByUsername(any())).thenReturn(user);
+        // Mock that email exists
+        when(userDAO.findByEmail(any())).thenReturn(user);
 
         mockMvc.perform(post("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"username\": \"loginuser\", \"password\": \"password123\"}"))
+                .content("{\"email\": \"test@example.com\", \"password\": \"password123\"}"))
             .andExpect(status().isUnauthorized());
     }
 }
