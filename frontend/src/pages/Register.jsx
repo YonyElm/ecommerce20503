@@ -4,7 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import {AuthContext} from "../context/AuthContext";
 
 function Register() {
-    const [form, setForm] = useState({ username: "", password: "", email: ""});
+    const [form, setForm] = useState({ email: "", password: "", fullName: ""});
     const [error, setError] = useState(null);
     const navigate = useNavigate();
     const authContext = useContext(AuthContext);
@@ -35,11 +35,11 @@ function Register() {
             <h2 className="text-2xl font-bold mb-4">Register</h2>
             <form onSubmit={handleSubmit}>
                 <input
-                    type="text"
-                    name="username"
-                    placeholder="Username"
+                    type="email"
+                    name="email"
+                    placeholder="Email"
                     className="w-full mb-3 p-2 border rounded"
-                    value={form.username}
+                    value={form.email}
                     onChange={handleChange}
                     required
                 />
@@ -53,11 +53,11 @@ function Register() {
                     required
                 />
                 <input
-                    type="email"
-                    name="email"
-                    placeholder="Email"
+                    type="text"
+                    name="fullName"
+                    placeholder="Full Name"
                     className="w-full mb-3 p-2 border rounded"
-                    value={form.email}
+                    value={form.fullName}
                     onChange={handleChange}
                     required
                 />

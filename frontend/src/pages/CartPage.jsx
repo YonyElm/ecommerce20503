@@ -1,16 +1,17 @@
 import React, {useContext} from "react";
 import { CartContext } from "../context/CartContext";
 import CartItem from "../components/CartItem";
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 
-const SHIPPING_COST = 5.99;
+const SHIPPING_COST = 0; // or any other value
 
 const CartPage = () => {
     const { cartItems, updateQuantity, removeItem } = useContext(CartContext);
-
     const subtotal = cartItems?.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const totalItems = cartItems?.reduce((sum, item) => sum + item.quantity, 0);
-    const total = subtotal + (cartItems?.length > 0 ? SHIPPING_COST : 0);
+    const shippingAmount = cartItems.length > 0 ? SHIPPING_COST : 0;
+    const total = subtotal + shippingAmount;
+    const navigate = useNavigate();
 
     return (
         <main className="container mx-auto mt-8 px-4">
@@ -46,7 +47,11 @@ const CartPage = () => {
                     </div>
                     <div className="cart-summary-line flex justify-between mb-2">
                         <span>Shipping:</span>
-                        <span>${cartItems.length > 0 ? SHIPPING_COST.toFixed(2) : "0.00"}</span>
+                        {SHIPPING_COST === 0 ? (
+                            <span className="text-green-600 font-semibold">FREE</span>
+                        ) : (
+                            <span>${shippingAmount.toFixed(2)}</span>
+                        )}
                     </div>
                     <div className="cart-summary-total flex justify-between mt-4 font-bold text-lg">
                         <span>Order Total:</span>
@@ -56,6 +61,7 @@ const CartPage = () => {
                         className="checkout-btn mt-6 w-full bg-cyan-500 text-white py-2 rounded font-semibold
                             hover:bg-cyan-700 disabled:opacity-50 disabled:bg-gray-300"
                         disabled={cartItems.length === 0}
+                        onClick={() => navigate("/checkout")}
                     >
                         Proceed to Checkout
                     </button>

@@ -1,10 +1,10 @@
-import {useState, useContext, useEffect} from "react";
+import { useState, useContext, useEffect } from "react";
 import { login } from "../api/auth";
 import { useNavigate, Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 
 function Login() {
-    const [username, setUsername] = useState("");
+    const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState(null);
     const navigate = useNavigate();
@@ -20,7 +20,7 @@ function Login() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            const res = await login({ username, password });
+            const res = await login({ email, password });
             authContext.login(res.data.token);
             navigate("/");
         } catch (err) {
@@ -33,11 +33,11 @@ function Login() {
             <h2 className="text-2xl font-bold mb-4">Login</h2>
             <form onSubmit={handleSubmit}>
                 <input
-                    type="text"
-                    placeholder="Username"
+                    type="email"
+                    placeholder="Email"
                     className="w-full mb-3 p-2 border rounded"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
                     required
                 />
                 <input

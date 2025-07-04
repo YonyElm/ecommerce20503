@@ -50,7 +50,7 @@ export const CartProvider = ({ children }) => {
         });
     }
 
-    const updateQuantity = (id, qty) => {
+    const updateQuantity = (id, qty, addition) => {
         setCartItems((items) => {
 
             if (user && user.sub) {
@@ -63,7 +63,7 @@ export const CartProvider = ({ children }) => {
                 return items.map((item) => {
                     if (item.id === id) {
                         // TBD: Cap it from the top with MaxInventory
-                        return { ...item, quantity: qty };
+                        return { ...item, quantity: addition? item.quantity + qty : qty };
                     } else {
                         return item;
                     }

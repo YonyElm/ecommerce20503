@@ -35,7 +35,7 @@ const CartItem = ({ item, updateQuantity, removeItem }) => {
                     name={`qty-item-${item.id}`}
                     value={item.quantity}
                     min={1}
-                    onChange={(e) => updateQuantity(item.id, Math.max(1, Number(e.target.value)))}
+                    onChange={(e) => updateQuantity(item.id, Math.max(1, Number(e.target.value)), false)}
                     className="w-16 border rounded py-1 px-2 text-center"
                 />
                 <button

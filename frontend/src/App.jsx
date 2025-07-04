@@ -9,6 +9,7 @@ import './App.css';
 import Footer from "./components/Footer";
 import ScrollToTop from "./components/ScrollToTop";
 import CartPage from "./pages/CartPage";
+import CheckoutPage from "./pages/CheckoutPage";
 
 function App() {
     return (
@@ -23,6 +24,8 @@ function App() {
                         <Route path="/register" element={<Register />} />
                         <Route path="/details/:productID" element={<DetailPage />} />
                         <Route path="/cart" element={<CartPage />} />
+                        <Route path="/checkout" element={<CheckoutPage />} />
+                        <Route path="/checkout/:productID" element={<CheckoutPage />} />
                         <Route element={<PrivateRoute />}>
                             {/* Protected routes go here */}
                         </Route>
