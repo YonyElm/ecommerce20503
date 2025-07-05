@@ -1,17 +1,27 @@
-import React, {useContext} from "react";
+import React, {useContext, useEffect} from "react";
 import { CartContext } from "../context/CartContext";
 import CartItem from "../components/CartItem";
 import {Link, useNavigate} from "react-router-dom";
+import {AuthContext} from "../context/AuthContext";
 
 const SHIPPING_COST = 0; // or any other value
 
 const CartPage = () => {
+    const authContext = useContext(AuthContext);
+    const navigate = useNavigate();
+
+    // When logged in, login page redirects to home page
+    useEffect(() => {
+        if (!authContext.loading && !authContext.user) {
+            navigate("/");
+        }
+    }, [authContext.user, authContext.loading, navigate]);
+
     const { cartItems, updateQuantity, removeItem } = useContext(CartContext);
     const subtotal = cartItems?.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const totalItems = cartItems?.reduce((sum, item) => sum + item.quantity, 0);
     const shippingAmount = cartItems.length > 0 ? SHIPPING_COST : 0;
     const total = subtotal + shippingAmount;
-    const navigate = useNavigate();
 
     return (
         <main className="container mx-auto mt-8 px-4">

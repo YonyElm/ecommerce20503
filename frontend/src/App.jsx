@@ -22,10 +22,10 @@ function App() {
                         <Route path="/" element={<Home />} />
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />
-                        <Route path="/details/:productID" element={<DetailPage />} />
+                        <Route path="/details/:productId" element={<DetailPage />} />
                         <Route path="/cart" element={<CartPage />} />
                         <Route path="/checkout" element={<CheckoutPage />} />
-                        <Route path="/checkout/:productID" element={<CheckoutPage />} />
+                        <Route path="/checkout/:productId" element={<CheckoutPage />} />
                         <Route element={<PrivateRoute />}>
                             {/* Protected routes go here */}
                         </Route>

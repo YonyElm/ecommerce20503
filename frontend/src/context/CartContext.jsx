@@ -54,16 +54,16 @@ export const CartProvider = ({ children }) => {
         setCartItems((items) => {
 
             if (user && user.sub) {
-                updateCartItem(user.sub, id, qty)
-                    .then((res) => console.log("Updated cart", res))
-                    .catch((err) => {
-                        console.error("Failed to update cart in DB", err);
-                    });
-
                 return items.map((item) => {
                     if (item.id === id) {
                         // TBD: Cap it from the top with MaxInventory
-                        return { ...item, quantity: addition? item.quantity + qty : qty };
+                        let quantity = addition? item.quantity + qty : qty;
+                        updateCartItem(user.sub, id, quantity)
+                            .then((res) => console.log("Updated cart", res))
+                            .catch((err) => {
+                                console.error("Failed to update cart in DB", err);
+                            });
+                        return { ...item, quantity: quantity};
                     } else {
                         return item;
                     }

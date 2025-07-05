@@ -1,5 +1,5 @@
 import React, { useContext } from "react";
-import { Link } from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import Spinner from "../components/Spinner";
 import {ChosenQuantityContext, DetailPageContext} from "../context/DetailPageContext";
 import { AuthContext } from "../context/AuthContext";
@@ -10,6 +10,7 @@ const DetailPage = () => {
     const [chosenQuantity, handleChosenQuantityChange] = ChosenQuantityContext();
     const { user: isSignedIn} = useContext(AuthContext);
     const {cartItems, addItem, updateQuantity} = useContext(CartContext);
+    const navigate = useNavigate();
 
     if (isLoading) {
         return (
@@ -37,7 +38,7 @@ const DetailPage = () => {
     };
 
     const buyNow = () => {
-        alert(`Proceeding to buy ${chosenQuantity} ${product.name}(s)!`);
+        navigate(`/checkout/${product.id}?quantity=${chosenQuantity}&price=${product.price}`);
     };
 
     const inStock = product.maxQuantity > 0;

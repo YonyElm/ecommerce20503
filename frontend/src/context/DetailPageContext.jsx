@@ -3,12 +3,12 @@ import {getProductDetailsById} from "../api/products";
 import {useParams} from "react-router-dom";
 
 const DetailPageContext = () => {
-    const { productID } = useParams();
+    const { productId } = useParams();
     const [product, setProduct] = useState(null);
     const [isLoading, setLoading] = useState(true);
 
     useEffect(() => {
-        getProductDetailsById(productID)
+        getProductDetailsById(productId)
             .then((res) => {
                 setProduct(res.data);
                 setLoading(false);
@@ -17,7 +17,7 @@ const DetailPageContext = () => {
                 console.error('Error loading categories', err);
                 setLoading(false);
             });
-    }, [productID]);
+    }, [productId]);
 
     return { product, isLoading};
 };

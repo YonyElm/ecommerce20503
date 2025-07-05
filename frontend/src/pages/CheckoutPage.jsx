@@ -1,24 +1,19 @@
-import React, { useContext, useState } from "react";
-import { CartContext } from "../context/CartContext";
+import React, {useState} from "react";
 import CheckoutContext from "../context/CheckoutContext";
 
-// Adjust this as needed
-const SHIPPING_COST = 0;
-
 const CheckoutPage = () => {
-    const { cartItems } = useContext(CartContext); // Make sure userId is in CartContext
     const {
         shippingAddressList,
         paymentMethodList,
         isLoading,
+        subtotalPrice,
+        shippingCost,
+        totalItems,
+        totalPrice
     } = CheckoutContext();
 
     const [selectedAddressId, setSelectedAddressId] = useState("");
     const [selectedPaymentId, setSelectedPaymentId] = useState("");
-
-    const subtotal = cartItems?.reduce((sum, item) => sum + item.price * item.quantity, 0) || 0;
-    const totalItems = cartItems?.reduce((sum, item) => sum + item.quantity, 0) || 0;
-    const total = subtotal + (cartItems.length > 0 ? SHIPPING_COST : 0);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -91,22 +86,22 @@ const CheckoutPage = () => {
                         <div className="checkout-section mb-8">
                             <h3 className="text-lg font-semibold mb-2">Order Review</h3>
                             <div className="order-summary-line flex justify-between mb-2">
-                                <span>Items:</span>
-                                <span>${subtotal.toFixed(2)}</span>
+                                <span>Items ({totalItems}):</span>
+                                <span>${subtotalPrice.toFixed(2)}</span>
                             </div>
                             <div className="order-summary-line flex justify-between mb-2">
                                 <span>Shipping:</span>
                                 <span>
-                                    {SHIPPING_COST === 0 ? (
+                                    {shippingCost === 0 ? (
                                         <span className="text-green-600 font-semibold">FREE</span>
                                     ) : (
-                                        `$${SHIPPING_COST.toFixed(2)}`
+                                        `$${shippingCost.toFixed(2)}`
                                     )}
                                 </span>
                             </div>
                             <div className="order-summary-total flex justify-between mt-4 font-bold text-lg">
                                 <span>Order Total:</span>
-                                <span>${total.toFixed(2)}</span>
+                                <span>${totalPrice.toFixed(2)}</span>
                             </div>
                         </div>
 
@@ -128,21 +123,21 @@ const CheckoutPage = () => {
                     <h3 className="text-xl font-semibold mb-4">Order Summary</h3>
                     <div className="order-summary-line flex justify-between mb-2">
                         <span>Items ({totalItems}):</span>
-                        <span>${subtotal.toFixed(2)}</span>
+                        <span>${subtotalPrice.toFixed(2)}</span>
                     </div>
                     <div className="order-summary-line flex justify-between mb-2">
                         <span>Shipping:</span>
                         <span>
-                            {SHIPPING_COST === 0 ? (
+                            {shippingCost === 0 ? (
                                 <span className="text-green-600 font-semibold">FREE</span>
                             ) : (
-                                `$${SHIPPING_COST.toFixed(2)}`
+                                `$${shippingCost.toFixed(2)}`
                             )}
                         </span>
                     </div>
                     <div className="order-summary-total flex justify-between mt-4 font-bold text-lg">
                         <span>Order Total:</span>
-                        <span>${total.toFixed(2)}</span>
+                        <span>${totalPrice.toFixed(2)}</span>
                     </div>
                 </div>
             </div>
