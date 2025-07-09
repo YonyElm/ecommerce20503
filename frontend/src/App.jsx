@@ -10,6 +10,7 @@ import Footer from "./components/Footer";
 import ScrollToTop from "./components/ScrollToTop";
 import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
+import OrdersPage from "./pages/OrdersPage";
 
 function App() {
     return (
@@ -26,6 +27,7 @@ function App() {
                         <Route path="/cart" element={<CartPage />} />
                         <Route path="/checkout" element={<CheckoutPage />} />
                         <Route path="/checkout/:productId" element={<CheckoutPage />} />
+                        <Route path="/orders" element={<OrdersPage />} />
                         <Route element={<PrivateRoute />}>
                             {/* Protected routes go here */}
                         </Route>

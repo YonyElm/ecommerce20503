@@ -1,5 +1,6 @@
 import React, {useState} from "react";
 import CheckoutContext from "../context/CheckoutContext";
+import {useNavigate} from "react-router-dom";
 
 const CheckoutPage = () => {
     const {
@@ -11,14 +12,14 @@ const CheckoutPage = () => {
         totalItems,
         totalPrice
     } = CheckoutContext();
+    const navigate = useNavigate();
 
     const [selectedAddressId, setSelectedAddressId] = useState("");
     const [selectedPaymentId, setSelectedPaymentId] = useState("");
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        // Submit order using selectedAddressId and selectedPaymentId
-        alert(`Order placed with Address ID ${selectedAddressId} and Payment ID ${selectedPaymentId}`);
+        navigate("/orders");
     };
 
     if (isLoading) return <p className="p-6 text-center text-gray-500">Loading checkout data...</p>;

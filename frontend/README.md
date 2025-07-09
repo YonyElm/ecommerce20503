@@ -1,70 +1,100 @@
-# Getting Started with Create React App
+# Ecommerce20503 Frontend
+
+This is the React frontend for the **Ecommerce20503** project, a full-stack ecommerce web application with a Spring Boot backend.  
+The frontend provides a user-friendly interface for browsing products, managing a shopping cart, and completing purchases.
+
+---
+
+## Getting Started
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Available Scripts
+### Prerequisites
 
-In the project directory, you can run:
+- [Node.js](https://nodejs.org/) (version 14 or above recommended)
+- [npm](https://www.npmjs.com/) (comes with Node.js)
 
-### `npm start`
+### Installation
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/YonyElm/ecommerce20503.git
+   cd ecommerce20503/frontend
+   ```
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
 
-### `npm test`
+### Running the Development Server
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```bash
+npm start
+```
 
-### `npm run build`
+- The app will be available at [http://localhost:3000](http://localhost:3000)
+- Make sure the backend is running (by default, on http://localhost:8080) for full functionality.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+---
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+## Project Structure
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```
+src/
+├── api/            # API utility functions (communicates with backend)
+├── components/     # React components (ProductList, Cart, Checkout, etc.)
+├── pages/          # Page-level components/views (Home, ProductDetail, CheckoutPage, etc.)
+├── App.js          # Main application component
+├── index.js        # Entry point
+```
 
-### `npm run eject`
+---
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+## Core Features
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- **Product Browsing:** View and search products by category.
+- **Product Details:** View detailed product information.
+- **User Authentication:** Login and register (connected to Spring Boot backend).
+- **Shopping Cart:** Add, remove, and update product quantities.
+- **Checkout:** Select shipping address and payment method, place orders.
+- **Order History:** View past orders (requires login).
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+---
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## Environment Variables
+
+If needed, create a `.env` file in the `frontend/` directory to override default API endpoints, e.g.:
+```
+REACT_APP_API_BASE_URL=http://localhost:8080/api
+```
+
+---
+
+## Scripts
+
+- `npm start` – Runs the app in development mode.
+- `npm test` – Launches the test runner.
+- `npm run build` – Builds the app for production.
+- `npm run eject` – Ejects the configuration (not recommended).
+
+---
+
+## Customization
+
+You can customize the frontend by editing components in the `src/components/` and `src/pages/` directories.  
+API requests are handled in the `src/api/` directory.
+
+---
 
 ## Learn More
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+- [React documentation](https://reactjs.org/)
+- [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started)
+- [Spring Boot backend (in this repo)](../backend/README.md)
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+---
 
-### Code Splitting
+## License
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+This project is open-source and available under the [MIT License](../LICENSE).
