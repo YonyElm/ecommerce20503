@@ -15,7 +15,7 @@ public class Inventory {
 
     @Id
     @Column(name = "product_id")
-    private Integer productId;
+    private int productId;
 
     @Min(0)
     @Column(nullable = false)

@@ -117,3 +117,13 @@ CREATE TABLE IF NOT EXISTS order_items (
     FOREIGN KEY (order_id) REFERENCES orders(id),
     FOREIGN KEY (product_id) REFERENCES products(id)
 );
+
+-- ORDER ITEM STATUS TABLE
+CREATE TABLE IF NOT EXISTS order_item_status (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    order_item_id INTEGER,
+    status TEXT NOT NULL DEFAULT 'processing',
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (order_item_id) REFERENCES order_items(id),
+    CHECK (status IN ('processing', 'shipped', 'delivered', 'cancelled', 'returned'))
+);

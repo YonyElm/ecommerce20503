@@ -2,8 +2,7 @@ package com.example.backend.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.sql.Timestamp;
@@ -11,7 +10,10 @@ import java.sql.Timestamp;
 @Getter
 @Setter
 @Entity
+@Builder
 @Table(name = "products")
+@NoArgsConstructor
+@AllArgsConstructor
 public class Product {
 
     @Id
@@ -38,15 +40,15 @@ public class Product {
     @Column(name = "created_at", nullable = false, updatable = false)
     private Timestamp createdAt;
 
-    // Used for JPA bean injection
-    public Product() {}
-
-    public Product(int id, String name, String description, BigDecimal price, Category category, Timestamp createdAt) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.price = price;
-        this.category = category;
-        this.createdAt = createdAt;
-    }
+//    // Used for JPA bean injection
+//    public Product() {}
+//
+//    public Product(int id, String name, String description, BigDecimal price, Category category, Timestamp createdAt) {
+//        this.id = id;
+//        this.name = name;
+//        this.description = description;
+//        this.price = price;
+//        this.category = category;
+//        this.createdAt = createdAt;
+//    }
 }

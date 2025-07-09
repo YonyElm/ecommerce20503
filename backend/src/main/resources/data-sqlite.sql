@@ -63,10 +63,21 @@ VALUES
 -- Insert order
 INSERT OR IGNORE INTO orders (id, user_id, total_amount, address_id, payment_id)
 VALUES
-  (1, 2, 284.99, 1, 1);
+  (1, 2, 284.99, 1, 1),
+  (2, 1, 284.99, 1, 1);
 
 -- Insert order items
 INSERT OR IGNORE INTO order_items (id, order_id, product_id, quantity, price_per_unit)
 VALUES
   (1, 1, 1, 2, 42.50),
-  (2, 1, 2, 1, 199.99);
+  (2, 1, 2, 1, 199.99),
+  (3, 2, 1, 2, 42.50),
+  (4, 2, 2, 1, 199.99);
+
+-- Insert order item statuses
+INSERT OR IGNORE INTO order_item_status (id, order_item_id, status, updated_at)
+VALUES
+  (1, 1, 'processing', '2024-01-15 10:30:00'),
+  (2, 2, 'shipped', '2024-01-16 14:20:00'),
+  (3, 3, 'delivered', '2024-01-14 16:45:00'),
+  (4, 4, 'processing', '2024-01-17 09:15:00');
