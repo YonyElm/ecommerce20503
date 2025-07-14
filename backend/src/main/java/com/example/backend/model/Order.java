@@ -23,7 +23,8 @@ public class Order {
     private User user;
 
     @Column(name = "order_date")
-    private LocalDateTime orderDate;
+    @Builder.Default
+    private final LocalDateTime orderDate = LocalDateTime.now();
 
     @Column(name = "total_amount", nullable = false)
     private Double totalAmount;

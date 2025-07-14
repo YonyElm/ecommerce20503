@@ -39,16 +39,4 @@ public class Product {
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Timestamp createdAt;
-
-//    // Used for JPA bean injection
-//    public Product() {}
-//
-//    public Product(int id, String name, String description, BigDecimal price, Category category, Timestamp createdAt) {
-//        this.id = id;
-//        this.name = name;
-//        this.description = description;
-//        this.price = price;
-//        this.category = category;
-//        this.createdAt = createdAt;
-//    }
 }

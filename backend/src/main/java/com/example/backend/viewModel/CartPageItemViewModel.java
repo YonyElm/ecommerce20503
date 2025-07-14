@@ -8,7 +8,8 @@ import java.math.BigDecimal;
 @Getter
 @Setter
 public class CartPageItemViewModel {
-    private Integer id;
+    private Integer itemId;
+    private Integer productId;
     private String name;
     private BigDecimal price;
     private Integer quantity;

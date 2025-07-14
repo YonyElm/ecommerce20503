@@ -8,6 +8,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import jakarta.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -17,24 +18,28 @@ public class CartPageService {
 
     private final CartItemDAO cartItemDAO;
     private final ShoppingCartDAO cartDAO;
+    private final EntityManager entityManager;
 
     @Autowired
     public CartPageService(CartItemDAO cartItemDAO,
-                           ShoppingCartDAO cartDAO) {
+                           ShoppingCartDAO cartDAO,
+                           EntityManager entityManager) {
         this.cartItemDAO = cartItemDAO;
         this.cartDAO = cartDAO;
+        this.entityManager = entityManager;
     }
 
     public List<CartPageItemViewModel> getCartItemsByUserId(int userId) {
 
         List<CartPageItemViewModel> cartPageItems = new ArrayList<>();
         ShoppingCart cart = cartDAO.getOrCreateCart(userId);
-        cart.setItems(cartItemDAO.findByCart(cart));
+        cart.setItems(cartItemDAO.findByCartAndIsActiveTrue(cart));
 
         for (CartItem item : cart.getItems()) {
             CartPageItemViewModel itemModel = new CartPageItemViewModel();
             Product product = item.getProduct();
-            itemModel.setId(product.getId());
+            itemModel.setItemId(item.getId());
+            itemModel.setProductId(product.getId());
             itemModel.setName(product.getName());
             itemModel.setPrice(product.getPrice());
             itemModel.setQuantity(item.getQuantity());
@@ -47,7 +52,7 @@ public class CartPageService {
 
     @Transactional
     public void addOrUpdateItem(ShoppingCart cart, int productId, int quantity) {
-        Optional<CartItem> existing = cartItemDAO.findByCart(cart).stream()
+        Optional<CartItem> existing = cartItemDAO.findByCartAndIsActiveTrue(cart).stream()
                 .filter(item -> item.getProduct().getId() == productId)
                 .findFirst();
 
@@ -56,19 +61,19 @@ public class CartPageService {
             item.setQuantity(quantity);
             cartItemDAO.save(item);
         } else {
-            Product proxyProduct = new Product();
-            proxyProduct.setId(productId);
+            Product proxyProduct = entityManager.getReference(Product.class, productId);
             CartItem item = new CartItem();
             item.setCart(cart);
             item.setProduct(proxyProduct);
             item.setQuantity(quantity);
+            item.setActive(true);
             cartItemDAO.save(item);
         }
     }
 
     @Transactional
-    public void removeItem(ShoppingCart cart, int productId) {
-        cartItemDAO.deleteByCartAndProductId(cart, productId);
+    public void removeItem(int cartItemId) {
+        cartItemDAO.deactivateByCartItemId(cartItemId);
     }
 
 }

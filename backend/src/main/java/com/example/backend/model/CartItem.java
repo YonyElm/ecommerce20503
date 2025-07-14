@@ -24,4 +24,7 @@ public class CartItem {
 
     @Column(nullable = false)
     private int quantity;
+
+    @Column(name = "is_active", columnDefinition = "BOOLEAN DEFAULT TRUE")
+    private boolean isActive = true;
 }

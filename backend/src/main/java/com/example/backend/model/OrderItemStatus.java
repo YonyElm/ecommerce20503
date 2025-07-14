@@ -24,7 +24,8 @@ public class OrderItemStatus {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    private Status status = Status.processing;
+    @Builder.Default
+    private final Status status = Status.processing;
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;

@@ -33,11 +33,9 @@ public class CartController {
         return ResponseEntity.ok("Item added to cart");
     }
 
-    @DeleteMapping("/remove")
-    public ResponseEntity<String> removeItem(@RequestHeader("userId") int userId,
-                                             @RequestParam int productId) {
-        ShoppingCart cart = cartDAO.getOrCreateCart(userId);
-        cartPageService.removeItem(cart, productId);
-        return ResponseEntity.ok("Item removed from cart");
+    @DeleteMapping("/remove/{cartItemId}")
+    public ResponseEntity<Void> removeItem(@PathVariable int cartItemId) {
+        cartPageService.removeItem(cartItemId);
+        return ResponseEntity.noContent().build(); 
     }
 }
