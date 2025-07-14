@@ -27,10 +27,10 @@ const DetailPage = () => {
     }
 
     const addToCart = () => {
-        if (cartItems.some(item => item.id === product.id)) {
+        if (cartItems.some(item => item.productId === product.id)) {
             updateQuantity(product.id, chosenQuantity, true);
         } else {
-            let item = {id: product.id, name: product.name,
+            let item = {productId: product.id, name: product.name,
                 price: product.price, quantity: chosenQuantity};
             addItem(item);
         }

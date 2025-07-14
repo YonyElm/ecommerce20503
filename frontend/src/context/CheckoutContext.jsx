@@ -11,21 +11,22 @@ const CheckoutContext = () => {
   const { productId } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const { cartItems } = useContext(CartContext);
+  const { cartItems, submitPlaceOrderForm } = useContext(CartContext);
 
   // --- Buy now/URL queries ---
   const query = new URLSearchParams(location.search);
   const buyNowPrice = Number(query.get("price") || -1);
-  const buyNowQuantity = Number(query.get("quantity") || 1);
+  const buyNowQuantity = Number(query.get("quantity") || -1);
 
   // --- Auth protection and redirect ---
   useEffect(() => {
     if (!authContext.loading &&
-      (!authContext.user || (productId && buyNowPrice < 0))
+      (!authContext.user || (productId 
+        && (buyNowPrice < 0 || buyNowQuantity < 0)))
     ) {
       navigate("/");
     }
-  }, [authContext.user, authContext.loading, navigate, productId, buyNowPrice]);
+  }, [authContext.user, authContext.loading, navigate, productId, buyNowPrice, buyNowQuantity]);
 
   // --- Checkout lists fetch ---
   const [shippingAddressList, setShippingAddressList] = useState([]);
@@ -70,7 +71,9 @@ const CheckoutContext = () => {
     subtotalPrice,
     shippingCost: SHIPPING_COST,
     totalItems,
-    totalPrice
+    totalPrice,
+    productId,
+    submitPlaceOrderForm
   };
 };
 

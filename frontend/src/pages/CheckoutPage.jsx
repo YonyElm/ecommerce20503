@@ -1,6 +1,7 @@
 import React, {useState} from "react";
 import CheckoutContext from "../context/CheckoutContext";
 import {useNavigate} from "react-router-dom";
+import Spinner from "../components/Spinner";
 
 const CheckoutPage = () => {
     const {
@@ -10,19 +11,22 @@ const CheckoutPage = () => {
         subtotalPrice,
         shippingCost,
         totalItems,
-        totalPrice
+        totalPrice,
+        productId,
+        submitPlaceOrderForm
     } = CheckoutContext();
     const navigate = useNavigate();
 
     const [selectedAddressId, setSelectedAddressId] = useState("");
     const [selectedPaymentId, setSelectedPaymentId] = useState("");
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        navigate("/orders");
-    };
-
-    if (isLoading) return <p className="p-6 text-center text-gray-500">Loading checkout data...</p>;
+    if (isLoading) {
+        return (
+            <div className="flex justify-center items-center h-64">
+                <Spinner />
+            </div>
+        );
+    }
 
     const isButtonDisabled = !selectedAddressId || !selectedPaymentId;
 
@@ -32,7 +36,7 @@ const CheckoutPage = () => {
 
             <div className="checkout-container grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div className="md:col-span-2">
-                    <form onSubmit={handleSubmit}>
+                    <form onSubmit={(e) => submitPlaceOrderForm(e, selectedAddressId, selectedPaymentId, productId, totalItems, navigate)}>
                         {/* Shipping Address */}
                         <div className="checkout-section mb-8">
                             <h3 className="text-lg font-semibold mb-2">Shipping Address</h3>

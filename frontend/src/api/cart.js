@@ -30,12 +30,8 @@ export async function updateCartItem(userId, productId, quantity) {
     return response.data;
 }
 
-export async function removeCartItem(userId, productId) {
+export async function removeCartItem(cartItemId) {
     return axios.delete(
-        `${API_BASE}/cart/remove`,
-        {
-            headers: { userId: userId },
-            params: { productId: productId }
-        }
+        `${API_BASE}/cart/remove/${cartItemId}`,{}
     );
 }
