@@ -12,7 +12,7 @@ VALUES
 
 -- Assign roles
 INSERT OR IGNORE INTO user_roles (user_id, role_id)
-VALUES 
+VALUES
   (1, 1), -- admin is ADMIN
   (2, 2); -- john_doe is CUSTOMER
 
@@ -74,10 +74,10 @@ VALUES
   (3, 2, 1, 2, 42.50),
   (4, 2, 2, 1, 199.99);
 
--- Insert order item statuses
+-- Insert order item statuses (Timed in UNIX TIMESTAMPS)
 INSERT OR IGNORE INTO order_item_status (id, order_item_id, status, updated_at)
 VALUES
-  (1, 1, 'processing', '2024-01-15 10:30:00'),
-  (2, 2, 'shipped', '2024-01-16 14:20:00'),
-  (3, 3, 'delivered', '2024-01-14 16:45:00'),
-  (4, 4, 'processing', '2024-01-17 09:15:00');
+  (1, 1, 'processing', 1705333800000), -- 2024-01-15 10:30:00 UTC (in milliseconds)
+  (2, 2, 'shipped', 1705424400000),    -- 2024-01-16 14:20:00 UTC
+  (3, 3, 'delivered', 1705183500000),  -- 2024-01-14 16:45:00 UTC
+  (4, 4, 'processing', 1705502100000); -- 2024-01-17 09:15:00 UTC

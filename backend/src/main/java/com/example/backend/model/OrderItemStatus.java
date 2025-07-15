@@ -24,8 +24,7 @@ public class OrderItemStatus {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    @Builder.Default
-    private final Status status = Status.processing;
+    private Status status;
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
@@ -36,5 +35,16 @@ public class OrderItemStatus {
         delivered,
         cancelled,
         returned
+    }
+
+    // --- Lifecycle Callbacks to ensure default values ---
+    @PrePersist // Called before a new entity is saved
+    protected void onCreate() {
+        if (this.status == null) {
+            this.status = Status.processing;
+        }
+        if (this.updatedAt == null) {
+            this.updatedAt = LocalDateTime.now();
+        }
     }
 }

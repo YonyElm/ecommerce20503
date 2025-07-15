@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface AddressDAO extends JpaRepository<Address, Long> {
+public interface AddressDAO extends JpaRepository<Address, Integer> {
     List<Address> findByUserIdAndIsActive(int userId, Boolean isActive);
 }

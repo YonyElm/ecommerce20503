@@ -23,8 +23,7 @@ public class Order {
     private User user;
 
     @Column(name = "order_date")
-    @Builder.Default
-    private final LocalDateTime orderDate = LocalDateTime.now();
+    private LocalDateTime orderDate;
 
     @Column(name = "total_amount", nullable = false)
     private Double totalAmount;
@@ -38,4 +37,12 @@ public class Order {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "payment_id", nullable = false)
     private Payment payment;
+
+    // --- Lifecycle Callbacks to ensure default values ---
+    @PrePersist // Called before a new entity is saved
+    protected void onCreate() {
+        if (this.orderDate == null) {
+            this.orderDate = LocalDateTime.now();
+        }
+    }
 }
