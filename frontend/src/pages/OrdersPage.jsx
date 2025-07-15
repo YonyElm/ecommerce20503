@@ -3,6 +3,7 @@ import Spinner from "../components/Spinner";
 import React from "react";
 import { Link } from "react-router-dom";
 import OrderItem from "../components/OrderItem";
+import NotFound from "../components/NotFound";
 
 function OrdersPage() {
   const { orders, loading } = OrdersContext();
@@ -18,14 +19,7 @@ function OrdersPage() {
   if (!orders.length) {
     return (
       <main className="container mx-auto mt-8 px-4">
-        <h2 className="text-3xl font-bold mb-6 text-gray-800">Your Orders</h2>
-        <div>No orders found.</div>
-        <Link
-          to="/"
-          className="text-cyan-500 hover:underline font-semibold"
-        >
-          Start Shopping
-        </Link>
+        <NotFound message="No orders found." />
       </main>
     );
   }

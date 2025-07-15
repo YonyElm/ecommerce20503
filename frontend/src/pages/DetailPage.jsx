@@ -4,6 +4,7 @@ import Spinner from "../components/Spinner";
 import {ChosenQuantityContext, DetailPageContext} from "../context/DetailPageContext";
 import { AuthContext } from "../context/AuthContext";
 import {CartContext} from "../context/CartContext";
+import NotFound from "../components/NotFound";
 
 const DetailPage = () => {
     const { product, isLoading } = DetailPageContext();
@@ -22,7 +23,9 @@ const DetailPage = () => {
 
     if (!product) {
         return (
-            <div className="text-center text-gray-500">No product found.</div>
+            <main className="container mx-auto mt-8 px-4">
+                <NotFound message="Can't find product, Perhaps it is no longer listed for sale." />
+            </main>
         );
     }
 

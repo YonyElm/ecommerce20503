@@ -1,24 +1,8 @@
 import React, { useState } from "react";
 import { MdImageNotSupported } from "react-icons/md";
 import {FaExclamationCircle} from "react-icons/fa";
+import {useNavigate} from "react-router-dom";
 
-/**
- * OrderItem component represents a single order with header, products, and summary.
- * Props:
- * - order: {
- *     id: string|number,
- *     date: string,
- *     total: number,
- *     products: Array<{
- *       id: string|number,
- *       name: string,
- *       image: string,
- *       qty: number,
- *       price: number,
- *       status: string
- *     }>
- *   }
- */
 const OrderItem = ({ order }) => (
   <div className="order-item border rounded-lg p-4 shadow bg-white">
     <div className="order-header flex justify-between items-center mb-3">
@@ -44,6 +28,18 @@ const OrderItem = ({ order }) => (
 
 const OrderProduct = ({ item, status }) => {
   const [imageError, setImageError] = useState(false);
+    const navigate = useNavigate();
+    const handleItemClick = (e) => {
+        // Prevent navigation when clicking action controls
+        if (
+            e.target.closest("input") ||
+            e.target.closest("button") ||
+            e.target.closest("a")
+        ) {
+            return;
+        }
+        navigate(`/details/${item.product.id}`);
+    };
 
   // fallback when product cant be loaded, preventing null-pointer-exception
   if (!item || !item.product) {
@@ -61,7 +57,7 @@ const OrderProduct = ({ item, status }) => {
   }
 
   return (
-    <div className="order-product-item flex flex-col sm:flex-row sm:items-center justify-between mb-2 p-2 border rounded-md bg-gray-50">
+    <div onClick={handleItemClick} className="order-product-item flex flex-col sm:flex-row sm:items-center justify-between mb-2 p-2 border rounded-md bg-gray-50 hover:bg-gray-100 transition cursor-pointer">
       <div className="flex items-center flex-1">
         <div className="order-product-image w-16 h-16 flex-shrink-0 rounded overflow-hidden bg-gray-100 mr-3 flex items-center justify-center">
           {!item.product.image || imageError ? (

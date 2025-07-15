@@ -1,6 +1,8 @@
 import React from "react";
+import {Link, useNavigate} from "react-router-dom";
 
 const CartItem = ({ item, updateQuantity, removeItem }) => {
+    const navigate = useNavigate();
     if (!item?.price || !item?.name || !item?.itemId || !item?.productId || !item?.quantity) {
         console.error(
             "CartItem: Missing required prop(s).",
@@ -15,8 +17,21 @@ const CartItem = ({ item, updateQuantity, removeItem }) => {
         return null;
     }
 
+    const handleItemClick = (e) => {
+        // Prevent navigation when clicking action controls
+        if (
+            e.target.closest("input") ||
+            e.target.closest("button") ||
+            e.target.closest("a")
+        ) {
+            return;
+        }
+        navigate(`/details/${item.productId}`);
+    };
+
     return (
-        <div className="cart-item flex items-center gap-4 mb-6 bg-white rounded shadow p-3">
+        <div className="cart-item flex items-center gap-4 mb-6 bg-white rounded shadow p-3 cursor-pointer hover:bg-gray-100 transition"
+            onClick={handleItemClick}>
             <div className="cart-item-image w-24 h-24 bg-gray-200 flex items-center justify-center rounded">
                 {item.image ? (
                     <img src={item.image} alt={item.name} className="object-contain w-full h-full rounded" />
@@ -36,7 +51,7 @@ const CartItem = ({ item, updateQuantity, removeItem }) => {
                     name={`qty-item-${item.itemId}`}
                     value={item.quantity}
                     min={1}
-                    onChange={(e) => updateQuantity(item.itemId, Math.max(1, Number(e.target.value)), false)}
+                    onChange={(e) => updateQuantity(item.productId, Math.max(1, Number(e.target.value)), false)}
                     className="w-16 border rounded py-1 px-2 text-center"
                 />
                 <button

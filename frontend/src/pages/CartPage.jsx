@@ -3,6 +3,7 @@ import { CartContext } from "../context/CartContext";
 import CartItem from "../components/CartItem";
 import {Link, useNavigate} from "react-router-dom";
 import {AuthContext} from "../context/AuthContext";
+import NotFound from "../components/NotFound";
 
 const SHIPPING_COST = 0; // or any other value
 
@@ -29,15 +30,7 @@ const CartPage = () => {
             <div className="cart-container grid grid-cols-1 md:grid-cols-3 gap-8">
                 <div className="md:col-span-2">
                     {!cartItems?.length ? (
-                        <div className="text-gray-500 flex flex-col items-start gap-2 mb-6">
-                            <span>Your cart is empty.</span>
-                            <Link
-                                to="/"
-                                className="text-cyan-500 hover:underline font-semibold"
-                            >
-                                Start Shopping
-                            </Link>
-                        </div>
+                        <NotFound message="Your cart is empty." />
                     ) : (
                         cartItems.map((item) => (
                             <CartItem
