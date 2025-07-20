@@ -16,6 +16,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.web.servlet.MockMvc;
 import java.sql.Timestamp;
+import java.util.Optional;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
@@ -52,8 +53,8 @@ public class AuthControllerTest {
 
         customerRole.setId(1);
         when(userDAO.existsByEmail(user.getEmail())).thenReturn(false);
-        doNothing().when(userDAO).registerUser(user);
-        when(userDAO.findByEmail(user.getEmail())).thenReturn(user);
+        when(userDAO.save(user)).thenReturn(user);
+        when(userDAO.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
         when(roleDAO.findByName("CUSTOMER")).thenReturn(customerRole);
 
         doNothing().when(roleDAO).assignRoleToUser(user.getId(), customerRole.getId());
@@ -75,7 +76,7 @@ public class AuthControllerTest {
         user.setPasswordHash(correctPasswordHash);
 
         // Mock that email exists
-        when(userDAO.findByEmail(any())).thenReturn(user);
+        when(userDAO.findByEmail(any())).thenReturn(Optional.of(user));
 
         // try login
         mockMvc.perform(post("/api/auth/login")
@@ -96,7 +97,7 @@ public class AuthControllerTest {
         user.setPasswordHash(correctPasswordHash);
 
         // Mock that email exists
-        when(userDAO.findByEmail(any())).thenReturn(user);
+        when(userDAO.findByEmail(any())).thenReturn(Optional.of(user));
 
         mockMvc.perform(post("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)

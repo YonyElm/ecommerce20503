@@ -1,34 +1,20 @@
 package com.example.backend.dao;
 
 import com.example.backend.model.User;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
-public class UserDAO {
+public interface UserDAO extends JpaRepository<User, Integer> {
+    Optional<User> findByEmail(String email);
+    Optional<User> findById(int userId);
+    boolean existsByEmail(String email);
 
-    private final JdbcTemplate jdbcTemplate;
-
-    @Autowired
-    public UserDAO(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
-    }
-
-    public void registerUser(User user) {
-        String sql = "INSERT INTO users (email, password_hash, full_name) VALUES (?, ?, ?)";
-        jdbcTemplate.update(sql, user.getEmail(), user.getPasswordHash(), user.getFullName());
-    }
-
-    public User findByEmail(String email) {
-        String sql = "SELECT * FROM users WHERE email = ?";
-        return jdbcTemplate.queryForObject(sql, new BeanPropertyRowMapper<>(User.class), email);
-    }
-
-    public boolean existsByEmail(String email) {
-        String sql = "SELECT COUNT(*) FROM users WHERE email = ?";
-        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, email);
-        return count > 0;
-    }
+    @Modifying
+    @Query("UPDATE User u SET u.fullName = :fullName WHERE u.id = :userId")
+    int updateFullNameById(int userId, String fullName);
 }

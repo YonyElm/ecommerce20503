@@ -38,10 +38,12 @@ public class AuthController {
         }
 
         user.setPasswordHash(PasswordEncoderUtil.encode(user.getPasswordHash()));
-        userDAO.registerUser(user);
+        userDAO.save(user);
 
         // Assign default CUSTOMER role
-        int userId = userDAO.findByEmail(user.getEmail()).getId();
+        User currentUser= userDAO.findByEmail(user.getEmail())
+                .orElseThrow(() -> new RuntimeException("User not found with email: " + user.getEmail()));
+        int userId = currentUser.getId();
         Role customerRole = roleDAO.findByName("CUSTOMER");
         roleDAO.assignRoleToUser(userId, customerRole.getId());
 
@@ -51,7 +53,8 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody Map<String, String> loginData) {
         try {
-            User user = userDAO.findByEmail(loginData.get("email"));
+            User user = userDAO.findByEmail(loginData.get("email"))
+                    .orElseThrow(() -> new RuntimeException("User not found with email: " + loginData.get("email")));
             if (PasswordEncoderUtil.matches(loginData.get("password"), user.getPasswordHash())) {
                 // Fetch roles of the user
                 List<Role> userRoles = roleDAO.getUserRoles(user.getId());

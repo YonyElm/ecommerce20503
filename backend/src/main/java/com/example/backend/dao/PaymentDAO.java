@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface PaymentDAO extends JpaRepository<Payment, Integer> {
-    List<Payment> findByUserIdAndIsActive(int UserId, Boolean isActive);
+    List<Payment> findByUser_IdAndIsActive(int UserId, Boolean isActive);
 }

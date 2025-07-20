@@ -8,5 +8,5 @@ import java.util.List;
 
 @Repository
 public interface AddressDAO extends JpaRepository<Address, Integer> {
-    List<Address> findByUserIdAndIsActive(int userId, Boolean isActive);
+    List<Address> findByUser_IdAndIsActive(int userId, Boolean isActive);
 }

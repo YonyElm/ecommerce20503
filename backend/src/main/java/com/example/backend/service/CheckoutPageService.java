@@ -23,14 +23,10 @@ public class CheckoutPageService {
     }
 
     public CheckoutPageViewModel getCheckoutPageDataByUserId(int userId) {
-        List<Address> addresses = addressDAO.findByUserIdAndIsActive(userId, true);
-        List<Payment> payments = paymentDAO.findByUserIdAndIsActive(userId, true);
+        List<Address> addresses = addressDAO.findByUser_IdAndIsActive(userId, true);
+        List<Payment> payments = paymentDAO.findByUser_IdAndIsActive(userId, true);
 
         CheckoutPageViewModel viewModel = new CheckoutPageViewModel();
-
-        // Addressing serialization issue when passing complex attributes
-        addresses.forEach(address -> address.setUser(null));
-        payments.forEach(payment -> payment.setUser(null));
 
         viewModel.setShipingAddressList(addresses);
         viewModel.setPaymentMethodList(payments);
