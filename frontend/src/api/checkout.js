@@ -46,8 +46,8 @@ export async function placeCartOrder(userId, addressId, paymentId) {
  * @param {String} userId The user's ID (required for the request header)
  * @param {String} addressId The selected shipping address ID
  * @param {String} paymentId The selected payment method ID
- * @param {String} productId The selected shipping address ID
- * @param {String} paymentId The selected payment method ID
+ * @param {String} productId The selected product ID
+ * @param {number} quantity The purchased product quantity
  * @returns {Promise} Promise resolving to the created order
  */
 export async function placeBuyItNowOrder(userId, addressId, paymentId, productId, quantity) {

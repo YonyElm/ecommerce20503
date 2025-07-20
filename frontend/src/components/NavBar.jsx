@@ -1,19 +1,12 @@
 import { useContext } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { CartContext } from "../context/CartContext";
 import { FaStore, FaShoppingCart } from "react-icons/fa";
 
 function Navbar() {
-    const { user, logout } = useContext(AuthContext);
+    const { user } = useContext(AuthContext);
     const { cartItems } = useContext(CartContext);
-    const navigate = useNavigate();
-
-    // Logout + Route Home
-    const handleLogout = () => {
-        logout();
-        navigate("/");
-    };
 
     return (
         <header className="py-3 sticky top-0 z-10 bg-gray-900 text-white shadow-md">
@@ -39,23 +32,14 @@ function Navbar() {
                     </Link>
 
                     {/* Account Info */}
-                    <div className="text-sm cursor-pointer">
-                        <div className="text-xs">
-                            {user && user.email ? `Hello, ${user.email}` : "Hello, Sign In"}
-                        </div>
-                        {user ? (
-                            <button
-                                className="font-bold text-left focus:outline-none"
-                                onClick={handleLogout}
-                            >
-                                Logout
-                            </button>
-                        ) : (
-                            <div className="font-bold">
-                                <Link to="/login">Account & Lists</Link>
+                    <Link to={user? "/settings" : "/login"}>
+                        <div className="text-sm cursor-pointer">
+                            <div className="text-xs">
+                                {user && user.email ? `Hello, ${user.email}` : "Hello, Sign In"}
                             </div>
-                        )}
-                    </div>
+                            <div className="font-bold">Account & Lists</div>
+                        </div>
+                    </Link>
 
                     {/* Orders */}
                     <Link to={user ? "/orders" : "/login"} className="text-sm">

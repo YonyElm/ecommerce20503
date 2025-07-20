@@ -11,6 +11,7 @@ import ScrollToTop from "./components/ScrollToTop";
 import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
 import OrdersPage from "./pages/OrdersPage";
+import UserSettingsPage from "./pages/UserSettingsPage";
 
 function App() {
     return (
@@ -23,6 +24,7 @@ function App() {
                         <Route path="/" element={<Home />} />
                         <Route path="/login" element={<Login />} />
                         <Route path="/register" element={<Register />} />
+                        <Route path="/settings" element={<UserSettingsPage/>} />
                         <Route path="/details/:productId" element={<DetailPage />} />
                         <Route path="/cart" element={<CartPage />} />
                         <Route path="/checkout" element={<CheckoutPage />} />

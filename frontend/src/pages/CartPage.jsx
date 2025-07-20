@@ -1,7 +1,7 @@
 import React, {useContext, useEffect} from "react";
 import { CartContext } from "../context/CartContext";
 import CartItem from "../components/CartItem";
-import {Link, useNavigate} from "react-router-dom";
+import {useNavigate} from "react-router-dom";
 import {AuthContext} from "../context/AuthContext";
 import NotFound from "../components/NotFound";
 
