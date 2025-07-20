@@ -6,8 +6,11 @@ import com.example.backend.viewModel.DetailPageViewModel;
 import com.example.backend.model.Product;
 import com.example.backend.model.Category;
 import com.example.backend.model.Inventory;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class DetailPageService {
@@ -22,9 +25,13 @@ public class DetailPageService {
         this.inventoryDAO = inventoryDAO;
     }
 
+    @Transactional
     public DetailPageViewModel getProductDetailById(int id) {
-        Product product = productDAO.getProductById(id);
-        if (product == null) return null;
+        Optional<Product> productOptional = productDAO.findById(id);
+        if (productOptional.isEmpty()) {
+            return null;
+        }
+        Product product = productOptional.get();
 
         // Fetch additional related data
         Category category = product.getCategory();

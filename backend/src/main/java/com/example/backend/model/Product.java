@@ -1,5 +1,7 @@
 package com.example.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -33,10 +35,17 @@ public class Product {
     @Column(nullable = false)
     private BigDecimal price;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
+    @JsonIgnore
     private Category category;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private Timestamp createdAt;
+
+    // Expose category_id for JSON serialization
+    @JsonProperty("category_id")
+    public Integer getCategoryId() {
+        return category != null ? category.getId() : null;
+    }
 }
