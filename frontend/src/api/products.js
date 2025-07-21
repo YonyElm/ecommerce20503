@@ -8,3 +8,7 @@ export async function getProducts() {
 export async function getProductDetailsById(id) {
     return axios.get(`${API_BASE}/products/${id}`, {});
 }
+
+export async function getProductsByCategory(categoryId) {
+    return axios.get(`${API_BASE}/products/category/${categoryId}`, {});
+}

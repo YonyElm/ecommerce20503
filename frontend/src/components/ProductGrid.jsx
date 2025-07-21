@@ -3,8 +3,8 @@ import ProductCard from './ProductCard';
 import ProductContext from '../context/ProductContext';
 import Spinner from './Spinner';
 
-function ProductGrid() {
-    const { products, loading: isLoading } = ProductContext();
+function ProductGrid({ selectedCategories }) {
+    const { products, loading: isLoading } = ProductContext(selectedCategories);
 
     if (isLoading) {
         return (

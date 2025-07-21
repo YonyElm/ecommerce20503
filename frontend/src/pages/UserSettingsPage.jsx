@@ -4,16 +4,7 @@ import Spinner from "../components/Spinner";
 import NotFound from "../components/NotFound";
 import AddressModal from "../components/modals/AddressModal";
 import PaymentMethodModal from "../components/modals/PaymentMethodModal";
-import {
-  Typography,
-  TextField,
-  Button as MuiButton,
-  Card,
-  CardContent,
-  CardActions,
-  Grid,
-  Box,
-} from "@mui/material";
+import {Typography, TextField, Button as MuiButton, Card, CardContent, CardActions, Grid, Box,} from "@mui/material";
 
 export default function UserSettingsPage() {
   const {

@@ -11,8 +11,8 @@ function CategoryPanel({ selectedCategoryIds, onSelectionChange }) {
 
     function handleCategoryClick(categoryId) {
         const next = selectedCategoryIds.includes(categoryId)
-            ? selectedCategoryIds.filter(id => id !== categoryId)
-            : [...selectedCategoryIds, categoryId];
+            ? [] // Deselect if clicking the same category
+            : [categoryId]; // Select only this category, deselecting all others
         onSelectionChange(next);
     }
 

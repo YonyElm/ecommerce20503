@@ -13,7 +13,7 @@ const Home = () => {
                     onSelectionChange={setSelectedCategories}
                 />
                 <div className="flex-1">
-                    <ProductGrid />
+                    <ProductGrid selectedCategories={selectedCategories} />
                 </div>
             </div>
         </div>

@@ -2,53 +2,71 @@ import { useContext } from "react";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 import { CartContext } from "../context/CartContext";
-import { FaStore, FaShoppingCart } from "react-icons/fa";
+import {Typography, AppBar, Toolbar, IconButton, Badge, Box, Button, Stack} from "@mui/material";
+import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
+import StorefrontIcon from "@mui/icons-material/Storefront";
 
 function Navbar() {
     const { user } = useContext(AuthContext);
     const { cartItems } = useContext(CartContext);
 
     return (
-        <header className="py-3 sticky top-0 z-10 bg-gray-900 text-white shadow-md">
-            <div className="container mx-auto flex justify-between items-center px-4">
-                {/* Logo with Shop Icon */}
-                <Link to="/" className="text-3xl font-bold flex items-center text-cyan-500">
-                    <FaStore className="text-3xl mr-2" />
-                    <span className="text-xl">
-                        <span>E</span>
-                        <span className="hidden sm:inline text-white">commerce20503</span>
-                        <span className="inline sm:hidden text-white">20503</span>
-                    </span>
-                </Link>
-
-                {/* Navigation */}
-                <nav className="flex items-center space-x-6">
-                    {/* Cart */}
-                    <Link to={user ? "/cart" : "/login"} className="relative">
-                        <FaShoppingCart className="text-2xl" />
-                        <span className="absolute -top-2 -right-2 rounded-full h-5 w-5 flex items-center justify-center text-xs font-bold bg-cyan-500 text-gray-900">
-                            {user && cartItems?.length ? cartItems?.length : 0}
-                        </span>
-                    </Link>
-
-                    {/* Account Info */}
-                    <Link to={user? "/settings" : "/login"}>
-                        <div className="text-sm cursor-pointer">
-                            <div className="text-xs">
-                                {user && user.email ? `Hello, ${user.email}` : "Hello, Sign In"}
-                            </div>
-                            <div className="font-bold">Account & Lists</div>
-                        </div>
-                    </Link>
-
-                    {/* Orders */}
-                    <Link to={user ? "/orders" : "/login"} className="text-sm">
-                        <div className="text-xs">Returns</div>
-                        <div className="font-bold">& Orders</div>
-                    </Link>
-                </nav>
-            </div>
-        </header>
+      <AppBar position="sticky" sx={{backgroundColor: 'customColors.headerDark'}}>
+          <Toolbar>
+              {/* Logo with Shop Icon */}
+              <Link to="/">
+                  <Box display="flex" alignItems="center">
+                      <StorefrontIcon sx={{ fontSize: 34, marginRight: 1, color: 'primary.main'}} />
+                      <Typography variant="h5" component="span" sx={{ fontWeight: 'bold' }}>
+                          <Box component="span" sx={{ color: 'primary.main'}}>E</Box>
+                          <Box component="span" sx={{ display: { xs: 'none', sm: 'inline' } }}>
+                              commerce20503
+                          </Box>
+                          <Box component="span" sx={{ display: { xs: 'inline', sm: 'none' } }}>
+                              20503
+                          </Box>
+                      </Typography>
+                  </Box>
+              </Link>
+              <Box flexGrow={1} />
+              {/* Navigation */}
+              <Stack direction="row" alignItems="center">
+                  {/* Cart */}
+                  <Link to={user ? "/cart" : "/login"} style={{ color: "inherit" }}>
+                      <IconButton size="large" color="inherit">
+                          <Badge badgeContent={user && cartItems?.length ? cartItems.length : 0} color="primary" overlap="circular">
+                              <ShoppingCartIcon sx={{ fontSize: 34 }} />
+                          </Badge>
+                      </IconButton>
+                  </Link>
+                  {/* Account Info */}
+                  <Button color="inherit"
+                          component={Link}
+                          to={user ? "/settings" : "/login"}
+                          sx={{ textTransform: 'none' }}>
+                      <Box textAlign="left">
+                          <Typography variant="body2">
+                              {user && user.email ? `Hello, ${user.email}` : "Hello, Sign In"}
+                          </Typography>
+                          <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>
+                              Account & Lists
+                          </Typography>
+                      </Box>
+                  </Button>
+                  {/* Orders */}
+                  <Button color="inherit"
+                      component={Link}
+                      to={user ? "/orders" : "/login"}
+                      sx={{ textTransform: 'none' }}
+                  >
+                      <Box textAlign="left">
+                          <Typography variant="body2">Returns</Typography>
+                          <Typography variant="subtitle2" sx={{ fontWeight: "bold" }}>& Orders</Typography>
+                      </Box>
+                  </Button>
+              </Stack>
+          </Toolbar>
+      </AppBar>
     );
 }
 
