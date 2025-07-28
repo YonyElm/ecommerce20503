@@ -23,8 +23,17 @@ public class Payment {
     @Column(nullable = false)
     private String name;
 
-    @Column(name = "is_active")
+    @Column(name = "is_active", columnDefinition = "BOOLEAN DEFAULT TRUE", nullable = false)
+    @JsonIgnore
     private Boolean isActive;
+
+    // --- Lifecycle Callbacks to ensure default values ---
+    @PrePersist // Called before a new entity is saved
+    protected void onCreate() {
+        if (this.isActive == null) {
+            this.isActive = true;
+        }
+    }
 
     // userId to serialize as int not as User
     @JsonProperty("userId")

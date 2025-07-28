@@ -49,9 +49,11 @@ public class AuthControllerTest {
     void testRegisterUser() throws Exception {
         User user = new User(1, "test@example.com", "password123"
                 , "Test User", new Timestamp(System.currentTimeMillis()), true);
-        Role customerRole = new Role("CUSTOMER");
+        Role customerRole = Role.builder()
+                .roleName(Role.RoleName.CUSTOMER)
+                .id(1)
+                .build();
 
-        customerRole.setId(1);
         when(userDAO.existsByEmail(user.getEmail())).thenReturn(false);
         when(userDAO.save(user)).thenReturn(user);
         when(userDAO.findByEmail(user.getEmail())).thenReturn(Optional.of(user));

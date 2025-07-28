@@ -66,7 +66,7 @@ public class CartPageService {
             item.setCart(cart);
             item.setProduct(proxyProduct);
             item.setQuantity(quantity);
-            item.setActive(true);
+            item.setIsActive(true);
             cartItemDAO.save(item);
         }
     }

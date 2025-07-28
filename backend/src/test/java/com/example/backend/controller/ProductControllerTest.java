@@ -5,6 +5,7 @@ import com.example.backend.dao.RoleDAO;
 import com.example.backend.model.Category;
 import com.example.backend.model.Product;
 import com.example.backend.model.Role;
+import com.example.backend.viewModel.DetailPageViewModel;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,10 +15,16 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 
 import java.math.BigDecimal;
 import java.util.Collections;
+import java.util.Map;
+import java.util.Optional;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.ArgumentMatchers.any;
@@ -46,7 +53,7 @@ public class ProductControllerTest {
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
-        validProduct = new Product(0, null, null, null, category, null);
+        validProduct = new Product(0, null, null, null, category, null, null, true);
         validProduct.setName("Test Product");
         validProduct.setDescription("A demo item");
         validProduct.setPrice(BigDecimal.valueOf(20.5));
@@ -54,9 +61,12 @@ public class ProductControllerTest {
 
     @Test
     void testGetAllProducts() throws Exception {
-
-        when(roleDAO.getUserRoles(1)).thenReturn(Collections.singletonList(new Role("ADMIN")));
-        when(productDAO.findAll()).thenReturn(Collections.singletonList(validProduct));
+        Role adminRole = Role.builder()
+                .roleName(Role.RoleName.ADMIN)
+                .id(1)
+                .build();
+        when(roleDAO.getUserRoles(1)).thenReturn(Collections.singletonList(adminRole));
+        when(productDAO.findByIsActiveTrue()).thenReturn(Collections.singletonList(validProduct));
         mockMvc.perform(get("/api/products")
                         .header("userId", 1))
                 .andExpect(status().isOk())
@@ -65,7 +75,7 @@ public class ProductControllerTest {
 
     @Test
     void testCreateProductInvalid() throws Exception {
-        Product invalid = new Product(0, "", null, BigDecimal.valueOf(-10), category, null);
+        Product invalid = new Product(0, "", null, BigDecimal.valueOf(-10), category, null, null, null);
 
         mockMvc.perform(post("/api/products")
                         .contentType(MediaType.APPLICATION_JSON)

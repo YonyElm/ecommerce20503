@@ -34,6 +34,7 @@ CREATE TABLE IF NOT EXISTS categories (
 -- PRODUCTS TABLE
 CREATE TABLE IF NOT EXISTS products (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    seller_id INTEGER NOT NULL,
     name TEXT NOT NULL,
     description TEXT,
     price REAL NOT NULL,
@@ -41,6 +42,7 @@ CREATE TABLE IF NOT EXISTS products (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     is_active BOOLEAN DEFAULT 1,
     FOREIGN KEY (category_id) REFERENCES categories(id)
+    FOREIGN KEY (seller_id) REFERENCES users(id)
 );
 
 -- INVENTORY TABLE

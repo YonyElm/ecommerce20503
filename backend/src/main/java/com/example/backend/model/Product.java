@@ -40,12 +40,34 @@ public class Product {
     @JsonIgnore
     private Category category;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private Timestamp createdAt;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "seller_id", nullable = false)
+    @JsonIgnore 
+    private User seller;
 
+    @Column(name = "created_at", nullable = false, updatable = false)
+    @JsonIgnore
+    private Timestamp createdAt;
+    
+    @Column(name = "is_active", columnDefinition = "BOOLEAN DEFAULT TRUE", nullable = false)
+    @JsonIgnore
+    private Boolean isActive;
+
+    // --- Lifecycle Callbacks to ensure default values ---
+    @PrePersist // Called before a new entity is saved
+    protected void onCreate() {
+        if (this.isActive == null) {
+            this.isActive = true;
+        }
+    }
     // Expose category_id for JSON serialization
     @JsonProperty("category_id")
     public Integer getCategoryId() {
         return category != null ? category.getId() : null;
+    }
+
+    @JsonProperty("seller_id")
+    public Integer getSellerId() {
+        return seller != null ? seller.getId() : null;
     }
 }

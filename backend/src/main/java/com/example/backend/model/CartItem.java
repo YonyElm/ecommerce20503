@@ -1,8 +1,11 @@
 package com.example.backend.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.time.LocalDateTime;
 
 @Setter
 @Getter
@@ -25,6 +28,15 @@ public class CartItem {
     @Column(nullable = false)
     private int quantity;
 
-    @Column(name = "is_active", columnDefinition = "BOOLEAN DEFAULT TRUE")
-    private boolean isActive = true;
+    @Column(name = "is_active", columnDefinition = "BOOLEAN DEFAULT TRUE", nullable = false)
+    @JsonIgnore
+    private Boolean isActive;
+
+    // --- Lifecycle Callbacks to ensure default values ---
+    @PrePersist // Called before a new entity is saved
+    protected void onCreate() {
+        if (this.isActive == null) {
+            this.isActive = true;
+        }
+    }
 }

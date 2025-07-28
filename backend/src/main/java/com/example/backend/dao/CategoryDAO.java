@@ -13,4 +13,5 @@ public interface CategoryDAO extends JpaRepository<Category, Integer> {
     @NonNull
     List<Category> findAll();
     Optional<Category> findById(int id);
+    Optional<Category> findFirstByNameIs(String categoryName);
 }

@@ -41,9 +41,17 @@ public class Address {
     @Column(name = "phone_number")
     private String phoneNumber;
 
-    @Column(name = "is_active", nullable = false)
+    @Column(name = "is_active", columnDefinition = "BOOLEAN DEFAULT TRUE", nullable = false)
     @JsonIgnore
     private Boolean isActive;
+
+    // --- Lifecycle Callbacks to ensure default values ---
+    @PrePersist // Called before a new entity is saved
+    protected void onCreate() {
+        if (this.isActive == null) {
+            this.isActive = true;
+        }
+    }
 
     // userId to serialize as int not as User
     @JsonProperty("userId")

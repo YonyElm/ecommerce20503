@@ -2,13 +2,15 @@ package com.example.backend.model;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import jakarta.persistence.*;
 
 @Getter
 @Setter
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "roles")
 public class Role {
 
@@ -17,12 +19,12 @@ public class Role {
     private int id;
 
     @Column(name = "role_name", nullable = false, unique = true)
-    private String roleName;
+    @Enumerated(EnumType.STRING)
+    private RoleName roleName;
 
-    // Used for JPA bean injection
-    public Role() {}
-
-    public Role(String roleName) {
-        this.roleName = roleName;
+    public enum RoleName {
+        ADMIN,
+        SELLER,
+        CUSTOMER,
     }
 }

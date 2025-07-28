@@ -58,7 +58,7 @@ public class AuthController {
             if (PasswordEncoderUtil.matches(loginData.get("password"), user.getPasswordHash())) {
                 // Fetch roles of the user
                 List<Role> userRoles = roleDAO.getUserRoles(user.getId());
-                List<String> roleNames = userRoles.stream()
+                List<Role.RoleName> roleNames = userRoles.stream()
                         .map(Role::getRoleName)
                         .collect(Collectors.toList());
 

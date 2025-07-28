@@ -12,7 +12,8 @@ import java.util.Optional;
 @Repository
 public interface ProductDAO extends JpaRepository<Product, Integer> {
     @NonNull
-    List<Product> findAll();
-    Optional<Product> findById(int productId);
-    List<Product> findByCategory_Id(int categoryId);
+    List<Product> findByIsActiveTrue();
+    Optional<Product> findByIdAndIsActiveTrue(int productId);
+    List<Product> findByCategory_IdAndIsActiveTrue(int categoryId);
+    List<Product> findBySeller_IdAndIsActiveTrue(int sellerId);
 }
