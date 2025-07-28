@@ -28,18 +28,11 @@ const OrderItem = ({ order }) => (
 
 const OrderProduct = ({ item, status }) => {
   const [imageError, setImageError] = useState(false);
-    const navigate = useNavigate();
-    const handleItemClick = (e) => {
-        // Prevent navigation when clicking action controls
-        if (
-            e.target.closest("input") ||
-            e.target.closest("button") ||
-            e.target.closest("a")
-        ) {
-            return;
-        }
-        navigate(`/details/${item.product.id}`);
-    };
+  const navigate = useNavigate();
+  const handleItemClick = (e) => {
+    e.stopPropagation();
+    navigate(`/details/${item.product.id}`);
+  };
 
   // fallback when product cant be loaded, preventing null-pointer-exception
   if (!item || !item.product) {

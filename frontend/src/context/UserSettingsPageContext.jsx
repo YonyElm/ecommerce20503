@@ -142,6 +142,10 @@ export function UserSettingsPageContext() {
     handleClosePaymentModal();
   };
 
+  const storeLink = () => {
+    navigate("/store");
+  }
+
   return {
     loading,
     error,
@@ -156,6 +160,7 @@ export function UserSettingsPageContext() {
     editPayment,
     deletePayment,
     logout: () => authContext.logout(),
+    storeLink,
     // Modals state & handlers
     isAddressModalOpen,
     editingAddress,

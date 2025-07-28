@@ -17,6 +17,7 @@ export default function UserSettingsPage() {
     deleteAddress,
     deletePayment,
     logout,
+    storeLink,
     // modals state & handlers
     isAddressModalOpen,
     editingAddress,
@@ -49,30 +50,25 @@ export default function UserSettingsPage() {
         <NotFound message="Could not find user settings. Please try again later." />
       ) : (
         <Grid container direction="column" spacing={4}>
-          <Grid item>
-            <ProfileForm profile={profile} updateProfile={updateProfile} />
-          </Grid>
-          <Grid item>
-            <AddressesSection
-              addresses={addresses}
-              deleteAddress={deleteAddress}
-              onEdit={handleOpenEditAddress}
-              onAdd={handleOpenAddAddress}
-            />
-          </Grid>
-          <Grid item>
-            <PaymentsSection
-              payments={payments}
-              onEdit={handleOpenEditPayment}
-              onAdd={handleOpenAddPayment}
-              deletePayment={deletePayment}
-            />
-          </Grid>
-          <Grid item>
-            <MuiButton sx={{ width: "100%" }} variant="contained" color="error" size="medium" onClick={logout}>
-              Logout
-            </MuiButton>
-          </Grid>
+          <ProfileForm profile={profile} updateProfile={updateProfile} />
+          <MuiButton sx={{ width: "100%" }} variant="contained" color="secondary" size="medium" onClick={storeLink}>
+            Manage online Store
+          </MuiButton>
+          <AddressesSection
+            addresses={addresses}
+            deleteAddress={deleteAddress}
+            onEdit={handleOpenEditAddress}
+            onAdd={handleOpenAddAddress}
+          />
+          <PaymentsSection
+            payments={payments}
+            onEdit={handleOpenEditPayment}
+            onAdd={handleOpenAddPayment}
+            deletePayment={deletePayment}
+          />
+          <MuiButton sx={{ width: "100%" }} variant="contained" color="error" size="medium" onClick={logout}>
+            Logout
+          </MuiButton>
         </Grid>
       )}
       <AddressModal

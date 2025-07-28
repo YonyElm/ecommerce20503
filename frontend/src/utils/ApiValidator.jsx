@@ -10,4 +10,8 @@ function isNumberString(input) {
     );
 }
 
-export { isNumberString };
+function isPositiveInteger(input) {
+    return Number.isInteger(input) && input > 0;
+}
+
+export { isNumberString, isPositiveInteger };
