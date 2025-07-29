@@ -20,6 +20,7 @@ export function UserSettingsPageContext() {
   const [profile, setProfile] = useState(null);
   const [addresses, setAddresses] = useState([]);
   const [payments, setPayments] = useState([]);
+  const [roleName, setRoleName] = useState("CUSTOMER");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -33,6 +34,7 @@ export function UserSettingsPageContext() {
           setProfile(res.data.user);
           setAddresses(res.data.addresses || []);
           setPayments(res.data.payments || []);
+          setRoleName(res.data.roleName || "CUSTOMER");
         }
         setLoading(false);
       })
@@ -146,12 +148,24 @@ export function UserSettingsPageContext() {
     navigate("/store");
   }
 
+  // Add becomeSeller functionality
+  const becomeSeller = async () => {
+    try {
+      await api.updateUserRole(authContext.user.sub,
+        { targetUserId: authContext.user.sub,  roleName: "SELLER" });
+      setRoleName("SELLER");
+    } catch (err) {
+      console.error("Failed to update role", err);
+    }
+  };
+
   return {
     loading,
     error,
     profile,
     addresses,
     payments,
+    roleName,
     updateProfile,
     addAddress,
     editAddress,
@@ -161,6 +175,7 @@ export function UserSettingsPageContext() {
     deletePayment,
     logout: () => authContext.logout(),
     storeLink,
+    becomeSeller,
     // Modals state & handlers
     isAddressModalOpen,
     editingAddress,

@@ -13,6 +13,7 @@ export default function UserSettingsPage() {
     profile,
     addresses,
     payments,
+    roleName,
     updateProfile,
     deleteAddress,
     deletePayment,
@@ -31,6 +32,7 @@ export default function UserSettingsPage() {
     handleOpenEditPayment,
     handleClosePaymentModal,
     handleSubmitPayment,
+    becomeSeller,
   } = UserSettingsPageContext();
 
   if (loading) {
@@ -50,10 +52,13 @@ export default function UserSettingsPage() {
         <NotFound message="Could not find user settings. Please try again later." />
       ) : (
         <Grid container direction="column" spacing={4}>
-          <ProfileForm profile={profile} updateProfile={updateProfile} />
-          <MuiButton sx={{ width: "100%" }} variant="contained" color="secondary" size="medium" onClick={storeLink}>
-            Manage online Store
-          </MuiButton>
+          <ProfileForm profile={profile} updateProfile={updateProfile} roleName={roleName} becomeSeller={becomeSeller} />
+          {(roleName === "ADMIN" || roleName === "SELLER") && (
+            <MuiButton sx={{ width: "100%" }} variant="contained" color="secondary"
+              size="medium" onClick={storeLink}>
+              {roleName === "SELLER" ? "Manage online Store" : "Visit Admin Page"}
+            </MuiButton>
+          )}
           <AddressesSection
             addresses={addresses}
             deleteAddress={deleteAddress}
@@ -87,7 +92,7 @@ export default function UserSettingsPage() {
   );
 }
 
-function ProfileForm({ profile, updateProfile }) {
+function ProfileForm({ profile, updateProfile, roleName, becomeSeller }) {
   const [form, setForm] = useState({
     fullName: profile?.fullName || "",
   });
@@ -138,16 +143,16 @@ function ProfileForm({ profile, updateProfile }) {
             error={error}
             helperText={error ? "Full Name is required" : ""}
           />
-          <MuiButton
-            sx={{ mt: 2 }}
-            type="submit"
-            variant="contained"
-            size="small"
-            disabled={saving}
-            color="primary"
-          >
+          <MuiButton sx={{ mt: 2, mr: 2 }} type="submit" variant="contained" size="small"
+            disabled={saving} color="primary">
             {saving ? "Saving..." : "Update Details"}
           </MuiButton>
+          {roleName === "CUSTOMER" && (
+            <MuiButton sx={{ mt: 2 }} type="button" variant="contained" size="small" color="secondary"
+              onClick={becomeSeller}>
+              Become a Seller
+            </MuiButton>
+          )}
         </Box>
       </CardContent>
     </Card>

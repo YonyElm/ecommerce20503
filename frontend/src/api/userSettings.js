@@ -27,7 +27,22 @@ export async function updateUserProfile(userId, profile) {
         userId
     );
   }
-  return axios.put(`${API_BASE}/user/profile`, profile, {
+  return axios.put(`${API_BASE}/user/profile/name`, profile, {
+    headers: { userId },
+  });
+}
+
+/**
+ * Update user's Role
+ */
+export async function updateUserRole(userId, data) {
+  if (!isNumberString(userId)) {
+    throw new Error(
+      "Invalid userId: must be a non-null, positive number string, instead:" +
+      userId
+    );
+  }
+  return axios.put(`${API_BASE}/user/profile/role`, data, {
     headers: { userId },
   });
 }
