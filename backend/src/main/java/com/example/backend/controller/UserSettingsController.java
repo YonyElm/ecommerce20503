@@ -28,7 +28,7 @@ public class UserSettingsController {
         return ResponseEntity.ok(userSettingsService.getUserSettings(userId));
     }
 
-    @PutMapping("/user/profile")
+    @PutMapping("/user/profile/name")
     public ResponseEntity<Map<String, String>> updateUserProfile(
             @RequestHeader("userId") int userId,
             @RequestBody Map<String, String> request) {
@@ -43,6 +43,20 @@ public class UserSettingsController {
         }
         profile.put("error", "Invalid fullName");
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(profile);
+    }
+
+    @PutMapping("/user/profile/role")
+    public ResponseEntity<Map<String, String>> updateUserRole(
+            @RequestHeader("userId") int performerUserId,
+            @RequestBody Map<String, String> request) {
+
+        String roleName = request.get("roleName");
+        String targetUserId = request.get("targetUserId");
+        if (roleName == null || targetUserId == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+
+        return userSettingsService.updateUserRole(performerUserId, performerUserId, roleName);
     }
 
     // --- Address Endpoints

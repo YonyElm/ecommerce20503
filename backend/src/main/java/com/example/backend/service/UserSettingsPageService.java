@@ -2,30 +2,36 @@ package com.example.backend.service;
 
 import com.example.backend.dao.AddressDAO;
 import com.example.backend.dao.PaymentDAO;
+import com.example.backend.dao.RoleDAO;
 import com.example.backend.dao.UserDAO;
 import com.example.backend.model.Address;
 import com.example.backend.model.Payment;
+import com.example.backend.model.Role;
 import com.example.backend.model.User;
 import com.example.backend.viewModel.UserSettingsPageViewModel;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class UserSettingsPageService {
 
     private final UserDAO userDAO;
+    private final RoleDAO roleDAO;
     private final AddressDAO addressDAO;
     private final PaymentDAO paymentDAO;
 
     @Autowired
-    public UserSettingsPageService(UserDAO userDAO, AddressDAO addressDAO, PaymentDAO paymentDAO) {
+    public UserSettingsPageService(UserDAO userDAO, AddressDAO addressDAO, PaymentDAO paymentDAO, RoleDAO roleDAO) {
         this.userDAO = userDAO;
         this.addressDAO = addressDAO;
         this.paymentDAO = paymentDAO;
+        this.roleDAO = roleDAO;
     }
 
     @Transactional
@@ -39,9 +45,18 @@ public class UserSettingsPageService {
 
         List<Address> addresses = addressDAO.findByUser_IdAndIsActive(userId, true);
         List<Payment> payments = paymentDAO.findByUser_IdAndIsActive(userId, true);
+        List<Role> userRoles = roleDAO.getUserRoles(userId);
+        List<Role.RoleName> userRoleNames = userRoles.stream().map(Role::getRoleName).toList();
 
         UserSettingsPageViewModel viewModel = new UserSettingsPageViewModel();
         viewModel.setUser(profileViewModel);
+        if (userRoleNames.contains(Role.RoleName.ADMIN)) {
+            viewModel.setRoleName(Role.RoleName.ADMIN.toString());
+        } else if (userRoleNames.contains(Role.RoleName.SELLER)) {
+            viewModel.setRoleName(Role.RoleName.SELLER.toString());
+        } else {
+            viewModel.setRoleName(Role.RoleName.CUSTOMER.toString());
+        }
         viewModel.setAddresses(addresses);
         viewModel.setPayments(payments);
 
@@ -51,6 +66,50 @@ public class UserSettingsPageService {
     @Transactional
     public void updateUserProfile(int userId, String fullName) {
         userDAO.updateFullNameById(userId, fullName);
+    }
+
+    @Transactional
+    public ResponseEntity<Map<String, String>> updateUserRole(int performingUserId,
+                                                              int targetUserId,
+                                                              String roleName) {
+        Map<String, String> response = new HashMap<>();
+        List<Role> performerRoles = roleDAO.getUserRoles(performingUserId);
+        if (performerRoles == null || performerRoles.isEmpty()) {
+            response.put("message", "User not found with id: " + performingUserId);
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+        }
+
+        List<Role.RoleName> performerRoleNames = performerRoles.stream().map(Role::getRoleName).toList();
+        if (performingUserId != targetUserId && !performerRoleNames.contains(Role.RoleName.ADMIN)) {
+            response.put("message", "User is not allowed to change role");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+        }
+        Role targetRole = roleDAO.findByName(roleName);
+        if (targetRole == null) {
+            response.put("message", "Role not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
+        List<Role> targetUserRoles = roleDAO.getUserRoles(targetUserId);
+        if (targetUserRoles == null || targetUserRoles.isEmpty()) {
+            response.put("message", "User not found");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
+        if (targetUserRoles.contains(targetRole)) {
+            response.put("message", "Role already exists");
+            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).body(response);
+        }
+
+        List<Role.RoleName> allowList = Arrays.asList(Role.RoleName.SELLER, Role.RoleName.CUSTOMER);
+        if (allowList.contains(targetRole.getRoleName())) {
+            roleDAO.assignRoleToUser(targetUserId, targetRole.getId());
+            response.put("roleName", targetRole.getRoleName().toString());
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }
+
+        response.put("message", "User is not allowed to change role");
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
     }
 
     @Transactional

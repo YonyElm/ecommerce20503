@@ -2,7 +2,8 @@
 INSERT OR IGNORE INTO roles (id, role_name)
 VALUES
   (1, 'ADMIN'),
-  (2, 'CUSTOMER');
+  (2, 'CUSTOMER'),
+  (3, 'SELLER');
 
 -- Insert users
 INSERT OR IGNORE INTO users (id, email, password_hash, full_name)

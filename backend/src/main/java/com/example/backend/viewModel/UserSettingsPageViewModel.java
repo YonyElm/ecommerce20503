@@ -12,6 +12,7 @@ import java.util.List;
 @Setter
 public class UserSettingsPageViewModel {
     private User user;
+    private String roleName;
     private List<Address> addresses;
     private List<Payment> payments;
 }
