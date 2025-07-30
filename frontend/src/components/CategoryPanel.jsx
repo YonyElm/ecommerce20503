@@ -1,6 +1,8 @@
+import React from "react";
 import Spinner from "./Spinner";
 import CategoryContext from "../context/CategoryContext";
 import CategoryCard from "./CategoryCard";
+import {Box, Paper, Typography, List, ListItem} from "@mui/material";
 
 /**
  * Sidebar panel using CategoryContext for category data.
@@ -21,28 +23,30 @@ function CategoryPanel({ selectedCategoryIds, onSelectionChange }) {
     }
 
     return (
-        <aside className="w-full md:w-1/6 bg-white p-6 rounded-lg shadow border border-gray-200 h-fit">
-            <h2 className="text-xl font-bold mb-4 text-gray-800">Shop by Category</h2>
-            {loading ? (
-                <div className="flex justify-center items-center h-24">
+      <Box sx={{maxWidth: 250}}>
+          <Paper sx={{p: 2}}>
+              <Typography variant="h5" fontWeight="bold">
+                  Shop by Category
+              </Typography>
+              {loading ? (
+                <Box display="flex" justifyContent="center" alignItems="center">
                     <Spinner />
-                </div>
-            ) : (
-                <nav>
-                    <ul>
-                        {categories.map(category => (
-                            <li className="mb-2" key={category.id}>
-                                <CategoryCard
-                                    category={category}
-                                    selected={selectedCategoryIds.includes(category.id)}
-                                    onClick={() => handleCategoryClick(category.id)}
-                                />
-                            </li>
-                        ))}
-                    </ul>
-                </nav>
-            )}
-        </aside>
+                </Box>
+              ) : (
+                <List>
+                    {categories.map((category, i) => (
+                      <React.Fragment key={category.id}>
+                          <ListItem disableGutters>
+                              <CategoryCard category={category}
+                                selected={selectedCategoryIds.includes(category.id)}
+                                onClick={() => handleCategoryClick(category.id)}/>
+                          </ListItem>
+                      </React.Fragment>
+                    ))}
+                </List>
+              )}
+          </Paper>
+      </Box>
     );
 }
 
