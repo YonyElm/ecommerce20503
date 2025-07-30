@@ -2,7 +2,6 @@ package com.example.backend.controller;
 
 import com.example.backend.dao.RoleDAO;
 import com.example.backend.model.Role;
-import com.example.backend.utils.JwtUtil;
 import com.example.backend.utils.PasswordEncoderUtil;
 import com.example.backend.dao.UserDAO;
 import com.example.backend.model.User;
@@ -14,9 +13,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+
+import static com.example.backend.utils.JwtUtil.getUserHighestPermissions;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -32,9 +33,11 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@RequestBody User user) {
+    public ResponseEntity<Map<String, String>> register(@RequestBody User user) {
+        Map<String, String> response = new HashMap<>();
         if (userDAO.existsByEmail(user.getEmail())) {
-            return ResponseEntity.badRequest().body("Username already taken");
+            response.put("message", "Email already exists");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
         }
 
         user.setPasswordHash(PasswordEncoderUtil.encode(user.getPasswordHash()));
@@ -46,30 +49,29 @@ public class AuthController {
         int userId = currentUser.getId();
         Role customerRole = roleDAO.findByName("CUSTOMER");
         roleDAO.assignRoleToUser(userId, customerRole.getId());
-
-        return ResponseEntity.ok("User registered successfully");
+        response.put("message", "User registered successfully");
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody Map<String, String> loginData) {
+    public ResponseEntity<Map<String, String>> login(@RequestBody Map<String, String> loginData) {
+        Map<String, String> response = new HashMap<>();
         try {
             User user = userDAO.findByEmail(loginData.get("email"))
                     .orElseThrow(() -> new RuntimeException("User not found with email: " + loginData.get("email")));
             if (PasswordEncoderUtil.matches(loginData.get("password"), user.getPasswordHash())) {
                 // Fetch roles of the user
                 List<Role> userRoles = roleDAO.getUserRoles(user.getId());
-                List<Role.RoleName> roleNames = userRoles.stream()
-                        .map(Role::getRoleName)
-                        .collect(Collectors.toList());
-
-                // Generate JWT
-                String token = JwtUtil.generateToken(user.getId(), user.getEmail(), roleNames);
-                return ResponseEntity.ok(Map.of("token", token));
+                String token = getUserHighestPermissions(userRoles, user);
+                response.put("token", token);
+                return ResponseEntity.status(HttpStatus.OK).body(response);
             } else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid credentials");
+                response.put("message", "Wrong password");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
             }
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("User not found");
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
     }
 }

@@ -13,10 +13,12 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import com.example.backend.utils.JwtUtil;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
-import java.util.stream.Collectors;
+
+import static com.example.backend.utils.JwtUtil.getUserHighestPermissions;
 
 @Service
 public class UserSettingsPageService {
@@ -104,6 +106,14 @@ public class UserSettingsPageService {
         List<Role.RoleName> allowList = Arrays.asList(Role.RoleName.SELLER, Role.RoleName.CUSTOMER);
         if (allowList.contains(targetRole.getRoleName())) {
             roleDAO.assignRoleToUser(targetUserId, targetRole.getId());
+
+            if (performingUserId == targetUserId) {
+                // Generate new token on the spot when User changes his own profile settings
+                List<Role> updatedUserRoles = roleDAO.getUserRoles(targetUserId);
+                User targetUser = userDAO.findById(targetUserId).orElseThrow(() -> new RuntimeException("User not found"));
+                String token = getUserHighestPermissions(updatedUserRoles, targetUser);
+                response.put("token", token);
+            }
             response.put("roleName", targetRole.getRoleName().toString());
             return ResponseEntity.status(HttpStatus.OK).body(response);
         }
