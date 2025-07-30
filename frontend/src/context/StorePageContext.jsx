@@ -13,8 +13,11 @@ export function StorePageContext() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!authContext.loading && !authContext.user) {
-      navigate("/");
+    if (!authContext.loading) {
+      const user = authContext.user;
+      if (!user || (user.roleName !== "ADMIN" && user.roleName !== "SELLER")) {
+        navigate("/");
+      }
     }
   }, [authContext.user, authContext.loading, navigate]);
 

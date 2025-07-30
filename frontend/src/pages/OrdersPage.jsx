@@ -15,19 +15,14 @@ function OrdersPage() {
     );
   }
 
-  if (!orders.length) {
-    return (
-      <main className="container mx-auto mt-8 px-4">
-        <NotFound message="No orders found." />
-      </main>
-    );
-  }
-
   return (
     <main className="container mx-auto mt-8 px-4">
       <h2 className="text-3xl font-bold mb-6 text-gray-800">Your Orders</h2>
       <div className="order-tracking-container space-y-8">
-        {orders.map((order) => (
+        {!orders.length ?
+          <NotFound message="No orders found." />
+          :
+          orders.map((order) => (
           <OrderItem key={order.order.id} order={order} />
         ))}
       </div>

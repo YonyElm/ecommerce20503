@@ -1,15 +1,16 @@
-import {useContext, useEffect, useState} from "react";
+import React, { useContext, useEffect, useState } from "react";
+import {Box, Card, CardContent, Typography, TextField,
+    Button as MuiButton, Link as MUILink, Alert} from "@mui/material";
 import { register } from "../api/auth";
 import { useNavigate, Link } from "react-router-dom";
-import {AuthContext} from "../context/AuthContext";
+import { AuthContext } from "../context/AuthContext";
 
 function Register() {
-    const [form, setForm] = useState({ email: "", password: "", fullName: ""});
+    const [form, setForm] = useState({ email: "", password: "", fullName: "" });
     const [error, setError] = useState(null);
     const navigate = useNavigate();
     const authContext = useContext(AuthContext);
 
-    // When logged in, register page redirects to home page
     useEffect(() => {
         if (authContext.user) {
             navigate("/");
@@ -18,6 +19,7 @@ function Register() {
 
     const handleChange = (e) => {
         setForm({ ...form, [e.target.name]: e.target.value });
+        setError(null);
     };
 
     const handleSubmit = async (e) => {
@@ -31,51 +33,42 @@ function Register() {
     };
 
     return (
-        <div className="max-w-md mx-auto mt-20 p-6 shadow-xl rounded-xl bg-white">
-            <h2 className="text-2xl font-bold mb-4">Register</h2>
-            <form onSubmit={handleSubmit}>
-                <input
-                    type="email"
-                    name="email"
-                    placeholder="Email"
-                    className="w-full mb-3 p-2 border rounded"
-                    value={form.email}
-                    onChange={handleChange}
-                    required
-                />
-                <input
-                    type="password"
-                    name="password"
-                    placeholder="Password"
-                    className="w-full mb-3 p-2 border rounded"
-                    value={form.password}
-                    onChange={handleChange}
-                    required
-                />
-                <input
-                    type="text"
-                    name="fullName"
-                    placeholder="Full Name"
-                    className="w-full mb-3 p-2 border rounded"
-                    value={form.fullName}
-                    onChange={handleChange}
-                    required
-                />
-                {error && <p className="text-red-600 mb-2">{error}</p>}
-                <button
-                    type="submit"
-                    className="w-full bg-cyan-500 text-white py-2 rounded hover:bg-cyan-700"
-                >
-                    Sign Up
-                </button>
-            </form>
-            <div className="mt-4 text-center">
-                <span className="text-gray-700">Already have an account?</span>{" "}
-                <Link to="/login" className="text-teal-700 hover:text-cyan-500 font-medium">
-                    Sign in
-                </Link>
-            </div>
-        </div>
+      <Box maxWidth="sm" mx="auto"
+        sx={{mt: 4, px: 2, display: "flex", justifyContent: "center", alignItems: "center",}}>
+          <Card sx={{ width: "70%"}}>
+              <CardContent>
+                  <Typography variant="h5" fontWeight="bold" gutterBottom>
+                      Register
+                  </Typography>
+                  <Box component="form" onSubmit={handleSubmit}>
+                      <TextField type="email" name="email" label="Email" placeholder="Email" size="small"
+                        fullWidth variant="outlined" margin="normal" value={form.email}
+                        onChange={handleChange} required/>
+                      <TextField type="password" name="password" label="Password" placeholder="Password" size="small"
+                        fullWidth variant="outlined" margin="normal" value={form.password} onChange={handleChange}
+                        required/>
+                      <TextField type="text" name="fullName" label="Full Name" placeholder="Full Name" fullWidth size="small"
+                        variant="outlined" margin="normal" value={form.fullName} onChange={handleChange} required/>
+                      {error && (
+                        <Alert severity="error" sx={{ mt: 1, mb: 1 }}>
+                            {error}
+                        </Alert>
+                      )}
+                      <MuiButton type="submit" variant="contained" color="primary" size="medium" fullWidth sx={{ mt: 2 }}>
+                          Sign Up
+                      </MuiButton>
+                  </Box>
+                  <Box sx={{ mt: 2, textAlign: "center" }}>
+                      <Typography variant="body2" component="span" color="text.primary">
+                          Already have an account?{" "}
+                      </Typography>
+                      <MUILink component={Link} to="/login" color="secondary" underline="hover" fontWeight="medium">
+                          Sign in
+                      </MUILink>
+                  </Box>
+              </CardContent>
+          </Card>
+      </Box>
     );
 }
 

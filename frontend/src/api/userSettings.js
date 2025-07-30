@@ -42,9 +42,10 @@ export async function updateUserRole(userId, data) {
       userId
     );
   }
-  return axios.put(`${API_BASE}/user/profile/role`, data, {
+  const response = await axios.put(`${API_BASE}/user/profile/role`, data, {
     headers: { userId },
   });
+  return response.data;
 }
 
 /**

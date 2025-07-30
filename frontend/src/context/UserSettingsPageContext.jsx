@@ -2,6 +2,7 @@ import { useEffect, useState, useContext } from "react";
 import * as api from "../api/userSettings";
 import { AuthContext } from "./AuthContext";
 import { useNavigate } from "react-router-dom";
+import {jwtDecode} from "jwt-decode";
 
 /**
  * Fetches and manages the user's profile, addresses, payment methods,
@@ -20,7 +21,6 @@ export function UserSettingsPageContext() {
   const [profile, setProfile] = useState(null);
   const [addresses, setAddresses] = useState([]);
   const [payments, setPayments] = useState([]);
-  const [roleName, setRoleName] = useState("CUSTOMER");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -34,7 +34,6 @@ export function UserSettingsPageContext() {
           setProfile(res.data.user);
           setAddresses(res.data.addresses || []);
           setPayments(res.data.payments || []);
-          setRoleName(res.data.roleName || "CUSTOMER");
         }
         setLoading(false);
       })
@@ -151,9 +150,11 @@ export function UserSettingsPageContext() {
   // Add becomeSeller functionality
   const becomeSeller = async () => {
     try {
-      await api.updateUserRole(authContext.user.sub,
+      let result = await api.updateUserRole(authContext.user.sub,
         { targetUserId: authContext.user.sub,  roleName: "SELLER" });
-      setRoleName("SELLER");
+      if (result?.token) {
+        authContext.login(result.token);
+      }
     } catch (err) {
       console.error("Failed to update role", err);
     }
@@ -165,7 +166,7 @@ export function UserSettingsPageContext() {
     profile,
     addresses,
     payments,
-    roleName,
+    roleName: authContext?.user?.roleName,
     updateProfile,
     addAddress,
     editAddress,
