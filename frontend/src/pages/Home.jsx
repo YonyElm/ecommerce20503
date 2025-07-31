@@ -1,22 +1,25 @@
-import React, { useState } from 'react';
-import ProductGrid from '../components/ProductGrid';
-import CategoryPanel from '../components/CategoryPanel';
+import React, { useState } from "react";
+import ProductGrid from "../components/ProductGrid";
+import CategoryContext from "../context/CategoryContext";
+import MenuPanel from "../components/MenuPanel";
+import { Box, Grid, Container } from "@mui/material";
 
 const Home = () => {
-    const [selectedCategories, setSelectedCategories] = useState([]);
+  const [selectedMenuIds, setSelectedMenuIds] = useState([]);
+  const { categories, loading } = CategoryContext();
 
     return (
-        <div className="p-4">
-            <div className="flex flex-col md:flex-row gap-8">
-                <CategoryPanel
-                    selectedCategoryIds={selectedCategories}
-                    onSelectionChange={setSelectedCategories}
-                />
-                <div className="flex-1">
-                    <ProductGrid selectedCategories={selectedCategories} />
-                </div>
-            </div>
-        </div>
+      <Container maxWidth="xl" sx={{ py: 4 }}>
+          <Grid container spacing={4}>
+              <Box sx={{ border: 0 }}>
+                <MenuPanel items={categories} loading={loading}
+                  selectedItemIds={selectedMenuIds} onSelectionChange={setSelectedMenuIds} title="Shop by Category"/>
+              </Box>
+              <Box sx={{ border: 0, flex: 1 }}>
+                <ProductGrid selectedCategories={selectedMenuIds} />
+              </Box>
+          </Grid>
+      </Container>
     );
 };
 

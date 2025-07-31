@@ -13,6 +13,7 @@ import CheckoutPage from "./pages/CheckoutPage";
 import OrdersPage from "./pages/OrdersPage";
 import UserSettingsPage from "./pages/UserSettingsPage";
 import StorePage from "./pages/StorePage";
+import AdminPage from "./pages/AdminPage";
 
 function App() {
     return (
@@ -32,6 +33,7 @@ function App() {
                         <Route path="/checkout" element={<CheckoutPage />} />
                         <Route path="/checkout/:productId" element={<CheckoutPage />} />
                         <Route path="/orders" element={<OrdersPage />} />
+                        <Route path="/admin" element={<AdminPage />} />
                         <Route element={<PrivateRoute />}>
                             {/* Protected routes go here */}
                         </Route>

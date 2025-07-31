@@ -27,7 +27,7 @@ export async function updateUserProfile(userId, profile) {
         userId
     );
   }
-  return axios.put(`${API_BASE}/user/profile/name`, profile, {
+  return axios.put(`${API_BASE}/user-settings/profile/name`, profile, {
     headers: { userId },
   });
 }
@@ -42,10 +42,9 @@ export async function updateUserRole(userId, data) {
       userId
     );
   }
-  const response = await axios.put(`${API_BASE}/user/profile/role`, data, {
+  return axios.put(`${API_BASE}/user-settings/profile/role`, data, {
     headers: { userId },
   });
-  return response.data;
 }
 
 /**
@@ -58,7 +57,7 @@ export async function addUserAddress(userId, address) {
         userId
     );
   }
-  return axios.post(`${API_BASE}/user/addresses`, address, {
+  return axios.post(`${API_BASE}/user-settings/addresses`, address, {
     headers: { userId },
   });
 }
@@ -73,7 +72,7 @@ export async function updateUserAddress(userId, addressId, address) {
         userId
     );
   }
-  return axios.put(`${API_BASE}/user/addresses/${addressId}`, address, {
+  return axios.put(`${API_BASE}/user-settings/addresses/${addressId}`, address, {
     headers: { userId },
   });
 }
@@ -88,7 +87,7 @@ export async function deleteUserAddress(userId, addressId) {
         userId
     );
   }
-  return axios.delete(`${API_BASE}/user/addresses/${addressId}`, {
+  return axios.delete(`${API_BASE}/user-settings/addresses/${addressId}`, {
     headers: { userId },
   });
 }
@@ -103,7 +102,7 @@ export async function addUserPaymentMethod(userId, payment)  {
       userId
     );
   }
-  return axios.post(`${API_BASE}/user/payments`, payment, {
+  return axios.post(`${API_BASE}/user-settings/payments`, payment, {
     headers: { userId },
   });
 }
@@ -118,7 +117,7 @@ export async function updateUserPaymentMethod(userId, paymentId, payment)  {
       userId
     );
   }
-  return axios.put(`${API_BASE}/user/payments/${paymentId}`, payment, {
+  return axios.put(`${API_BASE}/user-settings/payments/${paymentId}`, payment, {
     headers: { userId },
   });
 }
@@ -133,7 +132,7 @@ export async function deleteUserPaymentMethod(userId, paymentId)  {
       userId
     );
   }
-  return axios.delete(`${API_BASE}/user/payments/${paymentId}`, {
+  return axios.delete(`${API_BASE}/user-settings/payments/${paymentId}`, {
     headers: { userId },
   });
 }

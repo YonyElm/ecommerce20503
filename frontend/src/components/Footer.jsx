@@ -43,7 +43,7 @@ const Footer = () => {
           <Container maxWidth="lg">
               <Grid container spacing={2} justifyContent="space-between" alignItems="flex-start">
                   {linkSections.map((section) => (
-                    <Grid item  key={section.title}>
+                    <Grid  key={section.title}>
                         <Typography variant="subtitle1" sx={{ fontWeight: "bold", color: "common.white" }} gutterBottom>
                             {section.title}
                         </Typography>

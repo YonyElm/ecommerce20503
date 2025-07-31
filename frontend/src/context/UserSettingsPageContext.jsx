@@ -144,7 +144,11 @@ export function UserSettingsPageContext() {
   };
 
   const storeLink = () => {
-    navigate("/store");
+    if (authContext?.user?.roleName === "ADMIN") {
+      navigate("/admin");
+    } else if (authContext?.user?.roleName === "SELLER") {
+      navigate("/store");
+    }
   }
 
   // Add becomeSeller functionality
@@ -152,8 +156,8 @@ export function UserSettingsPageContext() {
     try {
       let result = await api.updateUserRole(authContext.user.sub,
         { targetUserId: authContext.user.sub,  roleName: "SELLER" });
-      if (result?.token) {
-        authContext.login(result.token);
+      if (result?.data?.token) {
+        authContext.login(result.data.token);
       }
     } catch (err) {
       console.error("Failed to update role", err);

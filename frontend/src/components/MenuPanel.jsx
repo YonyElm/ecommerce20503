@@ -1,53 +1,48 @@
 import React from "react";
+import { Box, Paper, Typography, List, ListItem } from "@mui/material";
 import Spinner from "./Spinner";
-import CategoryContext from "../context/CategoryContext";
-import CategoryCard from "./CategoryCard";
-import {Box, Paper, Typography, List, ListItem} from "@mui/material";
+import MenuItemCard from "./MenuItemCard";
 
 /**
- * Sidebar panel using CategoryContext for category data.
- * Each category is shown with a CategoryCard.
+ * Generic sidebar/menu panel for displaying a list of menu items.
  */
-function CategoryPanel({ selectedCategoryIds, onSelectionChange }) {
-    const { categories, loading } = CategoryContext();
-
-    function handleCategoryClick(categoryId) {
-        const next = selectedCategoryIds.includes(categoryId)
-            ? [] // Deselect if clicking the same category
-            : [categoryId]; // Select only this category, deselecting all others
-        onSelectionChange(next);
+function MenuPanel({items = [], loading = false, selectedItemIds = [],
+  onSelectionChange, title = "Menu", oneAlwaysOn = false}) {
+  function handleItemClick(itemId) {
+    if (oneAlwaysOn) {
+      onSelectionChange([itemId]);
+    } else {
+      const next = selectedItemIds.includes(itemId) ? [] : [itemId];
+      onSelectionChange(next);
     }
+  }
 
-    if (!loading && !categories?.length) {
-        return null;
-    }
+  if (!loading && (!items || !items.length)) {
+    return null;
+  }
 
-    return (
-      <Box sx={{maxWidth: 250}}>
-          <Paper sx={{p: 2}}>
-              <Typography variant="h5" fontWeight="bold">
-                  Shop by Category
-              </Typography>
-              {loading ? (
-                <Box display="flex" justifyContent="center" alignItems="center">
-                    <Spinner />
-                </Box>
-              ) : (
-                <List>
-                    {categories.map((category, i) => (
-                      <React.Fragment key={category.id}>
-                          <ListItem disableGutters>
-                              <CategoryCard category={category}
-                                selected={selectedCategoryIds.includes(category.id)}
-                                onClick={() => handleCategoryClick(category.id)}/>
-                          </ListItem>
-                      </React.Fragment>
-                    ))}
-                </List>
-              )}
-          </Paper>
-      </Box>
-    );
+  return (
+    <Box sx={{ maxWidth: 250 }}>
+      <Paper sx={{ p: 2 }}>
+        <Typography variant="h5" fontWeight="bold">
+          {title}
+        </Typography>
+        {loading ? (
+          <Box display="flex" justifyContent="center" alignItems="center">
+            <Spinner />
+          </Box>
+        ) : (
+          <List>
+            {items.map((item, i) => (
+              <ListItem disableGutters key={item.id}>
+                <MenuItemCard item={item} selected={selectedItemIds.includes(item.id)} onClick={handleItemClick}/>
+              </ListItem>
+            ))}
+          </List>
+        )}
+      </Paper>
+    </Box>
+  );
 }
 
-export default CategoryPanel;
+export default MenuPanel;
