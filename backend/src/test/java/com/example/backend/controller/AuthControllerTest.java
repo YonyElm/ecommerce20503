@@ -55,15 +55,14 @@ public class AuthControllerTest {
                 .build();
 
         when(userDAO.existsByEmail(user.getEmail())).thenReturn(false);
-        when(userDAO.save(user)).thenReturn(user);
-        when(userDAO.findByEmail(user.getEmail())).thenReturn(Optional.of(user));
+        when(userDAO.save(any())).thenReturn(user);
         when(roleDAO.findByName("CUSTOMER")).thenReturn(customerRole);
 
         doNothing().when(roleDAO).assignRoleToUser(user.getId(), customerRole.getId());
         mockMvc.perform(post("/api/auth/register")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(mapper.writeValueAsString(user)))
-            .andExpect(status().isOk())
+            .andExpect(status().isCreated())
             .andExpect(content().string(containsString("User registered successfully")));
     }
 
@@ -78,7 +77,7 @@ public class AuthControllerTest {
         user.setPasswordHash(correctPasswordHash);
 
         // Mock that email exists
-        when(userDAO.findByEmail(any())).thenReturn(Optional.of(user));
+        when(userDAO.findByEmailAndIsActiveTrue(any())).thenReturn(Optional.of(user));
 
         // try login
         mockMvc.perform(post("/api/auth/login")
@@ -99,7 +98,7 @@ public class AuthControllerTest {
         user.setPasswordHash(correctPasswordHash);
 
         // Mock that email exists
-        when(userDAO.findByEmail(any())).thenReturn(Optional.of(user));
+        when(userDAO.findByEmailAndIsActiveTrue(any())).thenReturn(Optional.of(user));
 
         mockMvc.perform(post("/api/auth/login")
                 .contentType(MediaType.APPLICATION_JSON)

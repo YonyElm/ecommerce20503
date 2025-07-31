@@ -98,9 +98,11 @@ public class UserSettingsPageService {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
 
-        if (targetUserRoles.contains(targetRole)) {
-            response.put("message", "Role already exists");
-            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).body(response);
+        for (Role role : targetUserRoles) {
+            if (role.getRoleName() == targetRole.getRoleName()) {
+                response.put("message", "Role already exists");
+                return ResponseEntity.status(HttpStatus.NOT_MODIFIED).body(response);
+            }
         }
 
         List<Role.RoleName> allowList = Arrays.asList(Role.RoleName.SELLER, Role.RoleName.CUSTOMER);

@@ -13,7 +13,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/user-settings")
 public class UserSettingsController {
 
     private final UserSettingsPageService userSettingsService;
@@ -23,12 +23,12 @@ public class UserSettingsController {
         this.userSettingsService = userSettingsService;
     }
 
-    @GetMapping("/user-settings")
+    @GetMapping
     public ResponseEntity<UserSettingsPageViewModel> getUserSettings(@RequestHeader("userId") int userId) {
         return ResponseEntity.ok(userSettingsService.getUserSettings(userId));
     }
 
-    @PutMapping("/user/profile/name")
+    @PutMapping("/profile/name")
     public ResponseEntity<Map<String, String>> updateUserProfile(
             @RequestHeader("userId") int userId,
             @RequestBody Map<String, String> request) {
@@ -45,7 +45,7 @@ public class UserSettingsController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(profile);
     }
 
-    @PutMapping("/user/profile/role")
+    @PutMapping("/profile/role")
     public ResponseEntity<Map<String, String>> updateUserRole(
             @RequestHeader("userId") int performerUserId,
             @RequestBody Map<String, String> request) {
@@ -55,20 +55,21 @@ public class UserSettingsController {
         if (roleName == null || targetUserId == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
+        int targetUserIdInt = Integer.parseInt(targetUserId);
 
-        return userSettingsService.updateUserRole(performerUserId, performerUserId, roleName);
+        return userSettingsService.updateUserRole(performerUserId, targetUserIdInt, roleName);
     }
 
     // --- Address Endpoints
 
-    @PostMapping("/user/addresses")
+    @PostMapping("/addresses")
     public ResponseEntity<?> addAddress(
             @RequestHeader("userId") int userId,
             @RequestBody Map<String, Object> request) {
         return addOrUpdateAddress(userId, request);
     }
 
-    @PutMapping("/user/addresses/{addressId}")
+    @PutMapping("/addresses/{addressId}")
     public ResponseEntity<?> updateAddress(
             @RequestHeader("userId") int userId,
             @PathVariable("addressId") int addressId,
@@ -77,7 +78,7 @@ public class UserSettingsController {
         return addOrUpdateAddress(userId, request);
     }
 
-    @DeleteMapping("/user/addresses/{addressId}")
+    @DeleteMapping("/addresses/{addressId}")
     public ResponseEntity<?> deleteAddress(
             @RequestHeader("userId") int userId,
             @PathVariable("addressId") int addressId) {
@@ -134,14 +135,14 @@ public class UserSettingsController {
 
     // --- Payment Method Endpoints
 
-    @PostMapping("/user/payments")
+    @PostMapping("/payments")
     public ResponseEntity<?> addPaymentMethod(
             @RequestHeader("userId") int userId,
             @RequestBody Map<String, Object> request) {
         return addOrUpdatePaymentMethod(userId, request);
     }
 
-    @PutMapping("/user/payments/{paymentId}")
+    @PutMapping("/payments/{paymentId}")
     public ResponseEntity<?> updatePaymentMethod(
             @RequestHeader("userId") int userId,
             @PathVariable("paymentId") int paymentId,
@@ -173,7 +174,7 @@ public class UserSettingsController {
         }
     }
 
-    @DeleteMapping("/user/payments/{paymentId}")
+    @DeleteMapping("/payments/{paymentId}")
     public ResponseEntity<?> deletePaymentMethod(
             @RequestHeader("userId") int userId,
             @PathVariable("paymentId") int paymentId) {

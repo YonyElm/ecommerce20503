@@ -5,6 +5,7 @@ import com.example.backend.model.Role;
 import com.example.backend.utils.PasswordEncoderUtil;
 import com.example.backend.dao.UserDAO;
 import com.example.backend.model.User;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static com.example.backend.utils.JwtUtil.getUserHighestPermissions;
 
@@ -32,6 +34,7 @@ public class AuthController {
         this.roleDAO = roleDAO;
     }
 
+    @Transactional
     @PostMapping("/register")
     public ResponseEntity<Map<String, String>> register(@RequestBody User user) {
         Map<String, String> response = new HashMap<>();
@@ -41,24 +44,27 @@ public class AuthController {
         }
 
         user.setPasswordHash(PasswordEncoderUtil.encode(user.getPasswordHash()));
-        userDAO.save(user);
+        User dbUser = userDAO.save(user);
 
-        // Assign default CUSTOMER role
-        User currentUser= userDAO.findByEmail(user.getEmail())
-                .orElseThrow(() -> new RuntimeException("User not found with email: " + user.getEmail()));
-        int userId = currentUser.getId();
+        int userId = dbUser.getId();
         Role customerRole = roleDAO.findByName("CUSTOMER");
         roleDAO.assignRoleToUser(userId, customerRole.getId());
         response.put("message", "User registered successfully");
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @Transactional
     @PostMapping("/login")
     public ResponseEntity<Map<String, String>> login(@RequestBody Map<String, String> loginData) {
         Map<String, String> response = new HashMap<>();
         try {
-            User user = userDAO.findByEmail(loginData.get("email"))
-                    .orElseThrow(() -> new RuntimeException("User not found with email: " + loginData.get("email")));
+            Optional<User> optionalUser = userDAO.findByEmailAndIsActiveTrue(loginData.get("email"));
+            if (optionalUser.isEmpty()) {
+                response.put("message", "Invalid email or password");
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+            }
+            User user = optionalUser.get();
+
             if (PasswordEncoderUtil.matches(loginData.get("password"), user.getPasswordHash())) {
                 // Fetch roles of the user
                 List<Role> userRoles = roleDAO.getUserRoles(user.getId());

@@ -3,14 +3,16 @@ package com.example.backend.model;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.sql.Timestamp;
 
 @Getter
 @Setter
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "users")
 public class User {
     @Id
@@ -31,18 +33,13 @@ public class User {
     private Timestamp registeredAt;
 
     @Column(name = "is_active", columnDefinition = "BOOLEAN DEFAULT TRUE", nullable = false)
-    @JsonIgnore
     private Boolean isActive;
 
-    // Used for JPA bean injection
-    public User() {}
-
-    public User(int id, String email, String passwordHash, String fullName, Timestamp registeredAt, boolean isActive) {
-        this.id = id;
-        this.email = email;
-        this.passwordHash = passwordHash;
-        this.fullName = fullName;
-        this.registeredAt = registeredAt;
-        this.isActive = isActive;
+    // --- Lifecycle Callbacks to ensure default values ---
+    @PrePersist // Called before a new entity is saved
+    protected void onCreate() {
+        if (this.isActive == null) {
+            this.isActive = true;
+        }
     }
 }
