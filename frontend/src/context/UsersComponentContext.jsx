@@ -41,7 +41,7 @@ export function UsersComponentContext() {
   const handleActivateUser = async (targetUserId, action) => {
     let data = {}
     data["targetUserId"] = targetUserId
-    data["action"] = "true"
+    data["action"] = action
     try {
       let result = await activateUser(authContext.user.sub, data);
       if (result.data.data != null) {

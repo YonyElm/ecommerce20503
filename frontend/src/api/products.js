@@ -23,6 +23,7 @@ export async function addProduct(userId, product) {
     }
     return axios.post(`${API_BASE}/products`, product, {
         headers: { userId },
+        "Content-Type": "application/json"
     });
 }
 

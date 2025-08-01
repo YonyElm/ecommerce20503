@@ -5,6 +5,7 @@ import StorePage from './StorePage';
 import OrdersPage from './OrdersPage';
 import { Box, Grid, Container } from "@mui/material";
 import UsersComponent from "../components/UsersComponent";
+import CategoriesPage from "../components/CategoriesComponent";
 
 const AdminPage = () => {
   const [selectedMenuIds, setSelectedMenuIds] = useState([1]);
@@ -20,6 +21,7 @@ const AdminPage = () => {
                     {selectedMenuIds.includes(1) && <OrdersPage />}
                     {selectedMenuIds.includes(2) && <StorePage />}
                     {selectedMenuIds.includes(3) && <UsersComponent />}
+                    {selectedMenuIds.includes(4) && <CategoriesPage />}
                 </Box>
             </Grid>
         </Container>
