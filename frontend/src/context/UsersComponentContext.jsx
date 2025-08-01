@@ -16,27 +16,25 @@ export function UsersComponentContext() {
       const user = authContext.user;
       if (!user || user.roleName !== "ADMIN") {
         navigate("/");
+      } else {
+        setLoading(true);
+        getUsers(authContext.user.sub)
+          .then(res => {
+            let users = res?.data?.users || [];
+            let roleNames = res?.data?.roleNames || [];
+            for (let i = 0; i < users.length; i++) {
+              users[i].roleName = roleNames[i] !== undefined ? roleNames[i] : 'N/A'
+            }
+            setUsers(users || []);
+            setLoading(false);
+          })
+          .catch(err => {
+            setError(err);
+            setLoading(false);
+          });
       }
     }
   }, [authContext.user, authContext.loading, navigate]);
-
-  useEffect(() => {
-    setLoading(true);
-    getUsers(authContext.user.sub)
-      .then(res => {
-        let users = res?.data?.users || [];
-        let roleNames = res?.data?.roleNames || [];
-        for (let i = 0; i < users.length; i++) {
-          users[i].roleName = roleNames[i] !== undefined ? roleNames[i] : 'N/A'
-        }
-        setUsers(users || []);
-        setLoading(false);
-      })
-      .catch(err => {
-        setError(err);
-        setLoading(false);
-      });
-  }, [authContext.user]);
 
   const handleActivateUser = async (targetUserId, action) => {
     let data = {}

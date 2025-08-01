@@ -10,7 +10,7 @@ import CategoriesPage from "../components/CategoriesComponent";
 const AdminPage = () => {
   const [selectedMenuIds, setSelectedMenuIds] = useState([1]);
 
-  const categories = [{id: 1, name: "Orders"}, {id: 2, name: "Products"}, {id: 3, name: "Users"}, {id: 4, name: "Categories"}];
+  const categories = [{id: 1, name: "Users"}, {id: 2, name: "Products"}, {id: 3, name: "Orders"}, {id: 4, name: "Categories"}];
     return (
         <Container maxWidth="xl">
             <Grid container spacing={4}>
@@ -18,9 +18,9 @@ const AdminPage = () => {
                 <MenuPanel items={categories} selectedItemIds={selectedMenuIds} onSelectionChange={setSelectedMenuIds} title="Admin Menu" oneAlwaysOn={true}/>
                 </Box>
                 <Box sx={{flex: 1}}>
-                    {selectedMenuIds.includes(1) && <OrdersPage />}
+                    {selectedMenuIds.includes(1) && <UsersComponent />}
                     {selectedMenuIds.includes(2) && <StorePage />}
-                    {selectedMenuIds.includes(3) && <UsersComponent />}
+                    {selectedMenuIds.includes(3) && <OrdersPage />}
                     {selectedMenuIds.includes(4) && <CategoriesPage />}
                 </Box>
             </Grid>
