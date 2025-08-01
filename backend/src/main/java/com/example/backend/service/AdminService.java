@@ -1,6 +1,8 @@
 package com.example.backend.service;
 
+import com.example.backend.controller.ApiResponse;
 import com.example.backend.dao.*;
+import com.example.backend.model.Category;
 import com.example.backend.model.Role;
 import com.example.backend.model.User;
 import jakarta.transaction.Transactional;
@@ -18,16 +20,19 @@ import static com.example.backend.utils.JwtUtil.getUserHighestPermissions;
 @Service
 public class AdminService {
 
-
     private final UserDAO userDAO;
     private final RoleDAO roleDAO;
+    private final CategoryDAO categoryDAO;
     private static final Logger logger = LoggerFactory.getLogger(AdminService.class);
 
     @Autowired
-    public AdminService(UserDAO userDAO, RoleDAO roleDAO) {
+    public AdminService(UserDAO userDAO, RoleDAO roleDAO, CategoryDAO categoryDAO) {
         this.userDAO = userDAO;
         this.roleDAO = roleDAO;
+        this.categoryDAO = categoryDAO;
     }
+
+    //--- Users tab
 
     @Transactional
     public ResponseEntity<Map<String, Object>> getUsers(int userId) {
@@ -107,5 +112,85 @@ public class AdminService {
         response.put("data", action);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
+    //--- Categories Tab
+
+    @Transactional
+    public List<Category> getAllCategories() {
+        return categoryDAO.findAll();
+    }
+
+    @Transactional
+    public ResponseEntity<ApiResponse<Category>> createCategory(int userId, String categoryName) {
+        ResponseEntity<ApiResponse<Category>> accessCheck = checkAdminAccess(userId, "create categories");
+        if (accessCheck != null) return accessCheck;
+
+        Category newCategory = Category.builder().name(categoryName).build();
+        Category savedCategory = categoryDAO.save(newCategory);
+        ApiResponse<Category> response = new ApiResponse<>(true, savedCategory, null);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @Transactional
+    public ResponseEntity<ApiResponse<Category>> updateCategory(int userId, int categoryId, String categoryName) {
+        ResponseEntity<ApiResponse<Category>> accessCheck = checkAdminAccess(userId, "update categories");
+        if (accessCheck != null) return accessCheck;
+
+        Optional<Category> categoryOptional = categoryDAO.findById(categoryId);
+        if (categoryOptional.isEmpty()) {
+            return errorResponse("3", "Category not found with id: " + categoryId, HttpStatus.NOT_FOUND);
+        }
+
+        Category category = categoryOptional.get();
+        category.setName(categoryName);
+        Category updatedCategory = categoryDAO.save(category);
+
+        ApiResponse<Category> response = new ApiResponse<>(true, updatedCategory, null);
+        return ResponseEntity.ok(response);
+    }
+
+    @Transactional
+    public ResponseEntity<ApiResponse<Category>> deleteCategory(int userId, int categoryId) {
+        // Check if the user has admin access
+        ResponseEntity<ApiResponse<Category>> accessCheck = checkAdminAccess(userId, "delete categories");
+        if (accessCheck != null) return accessCheck;
+
+        // Find the category by ID
+        Optional<Category> categoryOptional = categoryDAO.findById(categoryId);
+        if (categoryOptional.isEmpty()) {
+            return errorResponse("4", "Category not found with id: " + categoryId, HttpStatus.NOT_FOUND);
+        }
+
+        // Delete the category
+        categoryDAO.delete(categoryOptional.get());
+
+        // Return success response (optionally, you can return the deleted category info or null)
+        ApiResponse<Category> response = new ApiResponse<>(true, null, null);
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
+    }
+
+    private ResponseEntity<ApiResponse<Category>> checkAdminAccess(int userId, String actionDescription) {
+        List<Role> roles = roleDAO.getUserRoles(userId);
+        if (roles == null || roles.isEmpty()) {
+            return errorResponse("1", "Performing user not found with id: " + userId, HttpStatus.UNAUTHORIZED);
+        }
+
+        boolean isAdmin = roles.stream()
+                .map(Role::getRoleName)
+                .anyMatch(role -> role == Role.RoleName.ADMIN);
+
+        if (!isAdmin) {
+            return errorResponse("2", "User is not allowed to " + actionDescription, HttpStatus.UNAUTHORIZED);
+        }
+
+        return null; // null means access granted
+    }
+
+    private ResponseEntity<ApiResponse<Category>> errorResponse(String code, String message, HttpStatus status) {
+        ApiResponse.ApiError error = new ApiResponse.ApiError(code, message, null);
+        ApiResponse<Category> response = new ApiResponse<>(false, null, error);
+        return ResponseEntity.status(status).body(response);
+    }
+
 
 }
