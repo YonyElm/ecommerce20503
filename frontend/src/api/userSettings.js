@@ -12,8 +12,10 @@ export async function getUserSettings(userId) {
 
   return axios.get(`${API_BASE}/user-settings`, {
     headers: {
-      userId: userId,
+      userId,
+      "Content-Type": "application/json"
     },
+    validateStatus: () => true, // Always resolve the promise
   });
 }
 

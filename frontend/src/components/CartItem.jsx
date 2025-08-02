@@ -33,8 +33,8 @@ const CartItem = ({ item, updateQuantity, removeItem }) => {
       }}>
       <CardMedia component="div"
         sx={{width: 96, height: 96, display: "flex", alignItems: "center", justifyContent: "center",}}>
-        {item.image ? (
-          <img src={item.image} alt={item.name}
+        {item.imageURL ? (
+          <img src={item.imageURL} alt={item.name}
                style={{objectFit: "contain", width: "100%", height: "100%", borderRadius: 8,}}/>
         ) : (
           <Typography color="text.secondary" variant="body2">

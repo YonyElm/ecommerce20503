@@ -4,9 +4,9 @@ import { MdImageNotSupported } from "react-icons/md";
 function ProductCard({ product }) {
     return (
         <div className="border rounded-lg shadow p-4 bg-white hover:shadow-lg transition duration-200">
-            {product.imageUrl ? (
+            {product.imageURL ? (
                 <img
-                    src={product.imageUrl}
+                    src={product.imageURL}
                     alt={product.name}
                     className="w-full h-48 object-contain mb-2 rounded"
                 />

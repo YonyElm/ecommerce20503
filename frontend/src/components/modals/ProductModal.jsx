@@ -15,7 +15,7 @@ const DEFAULT_FORM = {
   description: "",
   price: "",
   maxQuantity: "",
-  imageUrl: "",
+  imageURL: "",
   categoryName: "",
 };
 
@@ -169,8 +169,8 @@ export default function ProductModal({ open, onClose, onSubmit, product, categor
           </TextField>
           <TextField
             label="Image URL"
-            name="imageUrl"
-            value={form.imageUrl}
+            name="imageURL"
+            value={form.imageURL}
             onChange={handleChange}
             fullWidth
             margin="normal"

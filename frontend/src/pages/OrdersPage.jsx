@@ -5,7 +5,7 @@ import NotFound from "../components/NotFound";
 import { Stack } from "@mui/material";
 
 function OrdersPage() {
-  const { orders, loading } = OrdersContext();
+  const { orders, loading, triggerOrdersRefresh} = OrdersContext();
 
   return (
     <PageContainer title="Your Orders" loading={loading}>
@@ -14,7 +14,7 @@ function OrdersPage() {
       ) : (
         <Stack spacing={3}>
           {orders.map((order) => (
-            <OrderItem key={order.order.id} order={order} />
+            <OrderItem key={order.order.id} order={order} triggerOrdersRefresh={triggerOrdersRefresh}/>
           ))}
         </Stack>
       )}

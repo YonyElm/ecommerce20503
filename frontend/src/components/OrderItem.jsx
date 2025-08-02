@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import { MdImageNotSupported } from "react-icons/md";
-import { useNavigate } from "react-router-dom";
-import {Alert, Card, CardContent, Typography, Box, Grid, Chip, Stack, Tooltip,} from "@mui/material";
+import {Alert, Card, CardContent, Typography, Box, Grid, Chip, Stack, Tooltip, Button, Menu, MenuItem,} from "@mui/material";
+import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
+import {OrderItemContext} from "../context/OrdersContext";
 
-const OrderItem = ({ order }) => (
+const OrderItem = ({ order, triggerOrdersRefresh}) => (
   <Card variant="outlined" sx={{backgroundColor: "background.paper", width: "100%",}}>
     <CardContent>
       <Box display="flex" alignItems="center" justifyContent="space-between">
@@ -23,6 +24,7 @@ const OrderItem = ({ order }) => (
             key={orderItemObj.orderItem.id}
             item={orderItemObj.orderItem}
             status={orderItemObj.statusList}
+            triggerOrdersRefresh={triggerOrdersRefresh}
           />
         ))}
       </Stack>
@@ -40,15 +42,9 @@ const OrderItem = ({ order }) => (
   </Card>
 );
 
-const OrderProduct = ({ item, status }) => {
-  const [imageError, setImageError] = useState(false);
-  const navigate = useNavigate();
-  const handleItemClick = (e) => {
-    e.stopPropagation();
-    navigate(`/details/${item.product.id}`);
-  };
+const OrderProduct = ({ item, status, triggerOrdersRefresh }) => {
+  const {anchorMenuElement, handleMenuOpen, handleMenuClose, handleMenuAction, handleLinkToDetailPage,} = OrderItemContext(item, triggerOrdersRefresh);
 
-// Product fallback
   if (!item || !item.product) {
     return (
       <Alert severity="error" sx={{ mb: 1 }}>
@@ -62,22 +58,19 @@ const OrderProduct = ({ item, status }) => {
   return (
     <Card variant="outlined"
       sx={{cursor: "pointer", "&:hover": {bgcolor: "grey.100"}}}
-      onClick={handleItemClick}>
+      onClick={handleLinkToDetailPage}>
       <CardContent>
         <Grid container alignItems="center" spacing={2}>
           <Grid>
             <Box
               sx={{width: 56, height: 56, overflow: "hidden", display: "flex",
                 alignItems: "center", justifyContent: "center",}}>
-              {!item.product.image || imageError ? (
+              {!item.product.imageURL ? (
                 <MdImageNotSupported size={36} data-testid="broken-img-icon" />
               ) : (
                 <img
-                  alt={item.product.name}
-                  src={item.product.image}
-                  style={{ width: "100%", height: "100%", objectFit: "cover" }}
-                  onError={() => setImageError(true)}
-                />
+                  alt={item.product.name} src={item.product.imageURL}
+                  style={{ width: "100%", height: "100%", objectFit: "cover" }}/>
               )}
             </Box>
           </Grid>
@@ -91,8 +84,25 @@ const OrderProduct = ({ item, status }) => {
             </Typography>
           </Grid>
           <Grid>
-            <Stack spacing={1} alignItems="flex-end">
+            <Stack direction="row" alignItems="center" spacing={1}>
+              {status?.[0]?.status && (
+                <Box>
+                  <Button variant="outlined" size="small" endIcon={<ArrowDropDownIcon />} onClick={handleMenuOpen}>
+                    Actions
+                  </Button>
+                  <Menu id="item-actions-menu" anchorEl={anchorMenuElement} open={Boolean(anchorMenuElement)}
+                    onClose={handleMenuClose} onClick={(e) => e.stopPropagation()}>
+                    {status?.[0]?.nextSteps.map((action) => (
+                      <MenuItem key={action} onClick={handleMenuAction(item.id, action)}>
+                        {action}
+                      </MenuItem>
+                    ))}
+                  </Menu>
+                </Box>
+              )}
               <Chip size="small" color="info" label={`Status: ${status?.[0]?.status ?? "N/A"}`}/>
+            </Stack>
+            <Stack spacing={1} alignItems="flex-end" mt={1}>
               <Tooltip title="Line Total" arrow>
                 <Typography variant="body1" fontWeight={600}>
                   Total: ${(item.quantity * item.product.price).toFixed(2)}

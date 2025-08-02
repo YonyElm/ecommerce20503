@@ -27,13 +27,16 @@ export function UserSettingsPageContext() {
   useEffect(() => {
     if (!authContext.user) return;
     setLoading(true);
-    api
-      .getUserSettings(authContext.user.sub)
+    api.getUserSettings(authContext.user.sub)
       .then((res) => {
-        if (res && res.data) {
-          setProfile(res.data.user);
-          setAddresses(res.data.addresses || []);
-          setPayments(res.data.payments || []);
+        if (res.data.success) {
+          if (res.data.data) {
+            setProfile(res.data.data.user);
+            setAddresses(res.data.data.addresses || []);
+            setPayments(res.data.data.payments || []);
+          }
+        } else {
+          authContext.logout();
         }
         setLoading(false);
       })
@@ -41,7 +44,7 @@ export function UserSettingsPageContext() {
         setError(err);
         setLoading(false);
       });
-  }, [authContext.user]);
+  }, [authContext]);
 
   const updateProfile = async (data) => {
     const res = await api.updateUserProfile(authContext.user.sub, data);

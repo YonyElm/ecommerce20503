@@ -72,7 +72,7 @@ export default function StorePage() {
                 >
                   <TableCell>
                     <Avatar
-                      src={product.imageUrl || "https://placehold.co/50x50/e0e0e0/666?text=Img"}
+                      src={product.imageURL || "https://placehold.co/50x50/e0e0e0/666?text=Img"}
                       alt={product.name}
                       variant="rounded"
                       sx={{ width: 50, height: 50 }}

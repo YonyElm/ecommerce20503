@@ -9,7 +9,21 @@ export async function getOrdersPage(userId) {
 
     return axios.get(`${API_BASE}/orders`, {
         headers: {
-            userId: userId
+            userId: userId,
+            "Content-Type": "application/json"
+        }
+    });
+}
+
+export async function updateOrderItemStatus(userId, orderItemId, dataObject) {
+    if (!isNumberString(userId)) {
+        throw new Error("Invalid userId: must be a non-null, positive number string, instead:" + userId);
+    }
+    let body = JSON.stringify(dataObject);
+    return axios.put(`${API_BASE}/orders/${orderItemId}/status`, body, {
+        headers: {
+            userId: userId,
+            "Content-Type": "application/json"
         }
     });
 }

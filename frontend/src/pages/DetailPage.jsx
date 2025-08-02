@@ -52,9 +52,9 @@ const DetailPage = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-white p-6 rounded-lg shadow border border-gray-200">
                 <div>
                     <div className="bg-gray-200 flex justify-center items-center h-[400px] w-full rounded text-4xl text-gray-400 mb-4">
-                        {product.image ? (
+                        {product.imageURL ? (
                             <img
-                                src={product.image}
+                                src={product.imageURL}
                                 alt={product.name}
                                 className="object-contain h-full w-full rounded"
                             />
