@@ -1,5 +1,6 @@
 package com.example.backend.service;
 
+import com.example.backend.controller.ApiResponse;
 import com.example.backend.dao.AddressDAO;
 import com.example.backend.dao.PaymentDAO;
 import com.example.backend.dao.RoleDAO;
@@ -37,9 +38,12 @@ public class UserSettingsPageService {
     }
 
     @Transactional
-    public UserSettingsPageViewModel getUserSettings(int userId) {
-        User user = userDAO.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+    public ResponseEntity<ApiResponse<UserSettingsPageViewModel>> getUserSettings(int userId) {
+        Optional<User> optionalUser = userDAO.findByIdAndIsActiveTrue(userId);
+        if (optionalUser.isEmpty()) {
+            return ApiResponse.errorResponse("0", "Active User not found with id: " + userId, HttpStatus.NOT_FOUND);
+        }
+        User user = optionalUser.get();
 
         User profileViewModel = new User();
         profileViewModel.setFullName(user.getFullName());
@@ -62,7 +66,8 @@ public class UserSettingsPageService {
         viewModel.setAddresses(addresses);
         viewModel.setPayments(payments);
 
-        return viewModel;
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(new ApiResponse<>(true, viewModel, null));
     }
 
     @Transactional

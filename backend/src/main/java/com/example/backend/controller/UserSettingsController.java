@@ -24,8 +24,8 @@ public class UserSettingsController {
     }
 
     @GetMapping
-    public ResponseEntity<UserSettingsPageViewModel> getUserSettings(@RequestHeader("userId") int userId) {
-        return ResponseEntity.ok(userSettingsService.getUserSettings(userId));
+    public ResponseEntity<ApiResponse<UserSettingsPageViewModel>> getUserSettings(@RequestHeader("userId") int userId) {
+        return userSettingsService.getUserSettings(userId);
     }
 
     @PutMapping("/profile/name")

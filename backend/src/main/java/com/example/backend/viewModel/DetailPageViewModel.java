@@ -14,4 +14,5 @@ public class DetailPageViewModel {
     private BigDecimal price;
     private String categoryName;
     private Integer maxQuantity;
+    private String imageURL;
 }

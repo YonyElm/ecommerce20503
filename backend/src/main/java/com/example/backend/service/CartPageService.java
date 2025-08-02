@@ -43,6 +43,7 @@ public class CartPageService {
             itemModel.setName(product.getName());
             itemModel.setPrice(product.getPrice());
             itemModel.setQuantity(item.getQuantity());
+            itemModel.setImageURL(product.getImageURL());
 
             cartPageItems.add(itemModel);
         }

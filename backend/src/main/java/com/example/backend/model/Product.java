@@ -51,7 +51,11 @@ public class Product {
     @Column(name = "created_at", nullable = false, updatable = false)
     @JsonIgnore
     private Timestamp createdAt;
-    
+
+    @Size(max = 1000, message = "imageURL can't exceed 1000 characters")
+    @Column(name = "image_url")
+    private String imageURL;
+
     @Column(name = "is_active", columnDefinition = "BOOLEAN DEFAULT TRUE", nullable = false)
     @JsonIgnore
     private Boolean isActive;

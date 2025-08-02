@@ -13,6 +13,7 @@ import java.util.Optional;
 public interface UserDAO extends JpaRepository<User, Integer> {
     Optional<User> findByEmailAndIsActiveTrue(String email);
     Optional<User> findById(int userId);
+    Optional<User> findByIdAndIsActiveTrue(int userId);
     List<User> findAll();
     boolean existsByEmail(String email);
 

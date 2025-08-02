@@ -142,6 +142,9 @@ public class StoreService {
         if (productData.containsKey("price")) {
             existing.setPrice(new BigDecimal(productData.get("price")));
         }
+        if (productData.containsKey("imageURL")) {
+            existing.setImageURL(productData.get("imageURL"));
+        }
 
         // Optionally set category if your Product entity supports it and category DAO is available
         if(productData.containsKey("categoryName")) {
@@ -165,6 +168,7 @@ public class StoreService {
             viewModel.setCategoryName(product.getCategory().getName());
         }
         viewModel.setMaxQuantity(inventory.getQuantity());
+        viewModel.setImageURL(product.getImageURL());
 
         return viewModel;
     }

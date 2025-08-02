@@ -12,7 +12,7 @@ import java.util.List;
 @Setter
 public class OrderViewModel {
     private Order order;
-    private List<OrderItemWithStatus> orderItemList;
+    private List<OrderItemWithStatusViewModel> orderItemList;
     private Address shippingAddress;
     private Payment paymentMethod;
 }

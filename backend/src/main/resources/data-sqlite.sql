@@ -24,10 +24,10 @@ VALUES
   (2, 'Electronics', 'Devices and accessories');
 
 -- Insert products
-INSERT OR IGNORE INTO products (id, name, description, price, category_id, seller_id)
+INSERT OR IGNORE INTO products (id, name, description, price, category_id, seller_id, image_url, is_active)
 VALUES
-  (1, 'Java 7th Edition', 'A book about Java Programming Language', 42.50, 1, 1),
-  (2, 'Headphones', 'Over-ear headphones', 199.99, 2, 1); 
+  (1, 'Java 7th Edition', 'A book about Java Programming Language', 42.50, 1, 1, '/product_assets/java_7th_1.jpeg', true),
+  (2, 'Headphones', 'Over-ear headphones', 199.99, 2, 1, '/product_assets/headphones_1.jpeg', true);
 
 -- Insert inventory
 INSERT OR IGNORE INTO inventory (product_id, quantity)

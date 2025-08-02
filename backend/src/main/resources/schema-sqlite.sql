@@ -41,6 +41,7 @@ CREATE TABLE IF NOT EXISTS products (
     category_id INTEGER,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     is_active BOOLEAN DEFAULT 1,
+    image_url TEXT,
     FOREIGN KEY (category_id) REFERENCES categories(id)
     FOREIGN KEY (seller_id) REFERENCES users(id)
 );

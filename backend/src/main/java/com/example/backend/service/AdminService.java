@@ -122,7 +122,7 @@ public class AdminService {
 
     @Transactional
     public ResponseEntity<ApiResponse<Category>> createCategory(int userId, String categoryName) {
-        ResponseEntity<ApiResponse<Category>> accessCheck = checkAdminAccess(userId, "create categories");
+        ResponseEntity<ApiResponse<Category>> accessCheck = ApiResponse.checkAdminAccess(userId, "create categories", roleDAO);
         if (accessCheck != null) return accessCheck;
 
         Category newCategory = Category.builder().name(categoryName).build();
@@ -133,12 +133,12 @@ public class AdminService {
 
     @Transactional
     public ResponseEntity<ApiResponse<Category>> updateCategory(int userId, int categoryId, String categoryName) {
-        ResponseEntity<ApiResponse<Category>> accessCheck = checkAdminAccess(userId, "update categories");
+        ResponseEntity<ApiResponse<Category>> accessCheck = ApiResponse.checkAdminAccess(userId, "update categories", roleDAO);
         if (accessCheck != null) return accessCheck;
 
         Optional<Category> categoryOptional = categoryDAO.findById(categoryId);
         if (categoryOptional.isEmpty()) {
-            return errorResponse("3", "Category not found with id: " + categoryId, HttpStatus.NOT_FOUND);
+            return ApiResponse.errorResponse("3", "Category not found with id: " + categoryId, HttpStatus.NOT_FOUND);
         }
 
         Category category = categoryOptional.get();
@@ -152,13 +152,13 @@ public class AdminService {
     @Transactional
     public ResponseEntity<ApiResponse<Category>> deleteCategory(int userId, int categoryId) {
         // Check if the user has admin access
-        ResponseEntity<ApiResponse<Category>> accessCheck = checkAdminAccess(userId, "delete categories");
+        ResponseEntity<ApiResponse<Category>> accessCheck = ApiResponse.checkAdminAccess(userId, "delete categories", roleDAO);
         if (accessCheck != null) return accessCheck;
 
         // Find the category by ID
         Optional<Category> categoryOptional = categoryDAO.findById(categoryId);
         if (categoryOptional.isEmpty()) {
-            return errorResponse("4", "Category not found with id: " + categoryId, HttpStatus.NOT_FOUND);
+            return ApiResponse.errorResponse("4", "Category not found with id: " + categoryId, HttpStatus.NOT_FOUND);
         }
 
         // Delete the category
@@ -168,29 +168,4 @@ public class AdminService {
         ApiResponse<Category> response = new ApiResponse<>(true, null, null);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
     }
-
-    private ResponseEntity<ApiResponse<Category>> checkAdminAccess(int userId, String actionDescription) {
-        List<Role> roles = roleDAO.getUserRoles(userId);
-        if (roles == null || roles.isEmpty()) {
-            return errorResponse("1", "Performing user not found with id: " + userId, HttpStatus.UNAUTHORIZED);
-        }
-
-        boolean isAdmin = roles.stream()
-                .map(Role::getRoleName)
-                .anyMatch(role -> role == Role.RoleName.ADMIN);
-
-        if (!isAdmin) {
-            return errorResponse("2", "User is not allowed to " + actionDescription, HttpStatus.UNAUTHORIZED);
-        }
-
-        return null; // null means access granted
-    }
-
-    private ResponseEntity<ApiResponse<Category>> errorResponse(String code, String message, HttpStatus status) {
-        ApiResponse.ApiError error = new ApiResponse.ApiError(code, message, null);
-        ApiResponse<Category> response = new ApiResponse<>(false, null, error);
-        return ResponseEntity.status(status).body(response);
-    }
-
-
 }

@@ -13,5 +13,5 @@ public class CartPageItemViewModel {
     private String name;
     private BigDecimal price;
     private Integer quantity;
-    // private String image id
+    private String imageURL;
 }

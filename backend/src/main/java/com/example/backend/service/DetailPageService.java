@@ -58,6 +58,7 @@ public class DetailPageService {
         if (inventory != null && inventory.getQuantity() != null) {
             viewModel.setMaxQuantity(inventory.getQuantity());
         }
+        viewModel.setImageURL(product.getImageURL());
 
         return viewModel;
     }
