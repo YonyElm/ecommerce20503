@@ -32,7 +32,7 @@ function App() {
                         <Route path="/cart" element={<CartPage />} />
                         <Route path="/checkout" element={<CheckoutPage />} />
                         <Route path="/checkout/:productId" element={<CheckoutPage />} />
-                        <Route path="/orders" element={<OrdersPage />} />
+                        <Route path="/orders" element={<OrdersPage adminFlag={false} />} />
                         <Route path="/admin" element={<AdminPage />} />
                         <Route element={<PrivateRoute />}>
                             {/* Protected routes go here */}

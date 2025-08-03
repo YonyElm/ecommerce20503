@@ -4,8 +4,8 @@ import OrderItem from "../components/OrderItem";
 import NotFound from "../components/NotFound";
 import { Stack } from "@mui/material";
 
-function OrdersPage() {
-  const { orders, loading, triggerOrdersRefresh} = OrdersContext();
+function OrdersPage(adminFlag) {
+  const { orders, loading, triggerOrdersRefresh} = OrdersContext(adminFlag);
 
   return (
     <PageContainer title="Your Orders" loading={loading}>

@@ -20,7 +20,7 @@ const AdminPage = () => {
                 <Box sx={{flex: 1}}>
                     {selectedMenuIds.includes(1) && <UsersComponent />}
                     {selectedMenuIds.includes(2) && <StorePage />}
-                    {selectedMenuIds.includes(3) && <OrdersPage />}
+                    {selectedMenuIds.includes(3) && <OrdersPage adminFlag={true}/>}
                     {selectedMenuIds.includes(4) && <CategoriesPage />}
                 </Box>
             </Grid>

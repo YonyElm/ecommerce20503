@@ -49,7 +49,7 @@ export function OrderItemContext(item, triggerOrdersRefresh) {
 }
 
 // OrdersContext provides order data loading and state
-export const OrdersContext = () => {
+export const OrdersContext = (adminFlag) => {
   const authContext = useContext(AuthContext);
   const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
@@ -80,7 +80,11 @@ export const OrdersContext = () => {
       return;
     }
 
-    getOrdersPage(authContext.user.sub)
+    let fetchAll = {fetchAll: false}
+    if (adminFlag.adminFlag) {
+      fetchAll = {fetchAll: true}
+    }
+    getOrdersPage(authContext.user.sub, fetchAll)
       .then((res) => {
         if (res.data.success) {
           setOrders(res.data.data);
@@ -95,7 +99,7 @@ export const OrdersContext = () => {
       .finally(() => {
         setLoading(false);
       });
-  }, [authContext.loading, authContext.user, navigate, refreshFlag]);
+  }, [authContext.loading, authContext.user, navigate, refreshFlag, adminFlag]);
 
   return { orders, loading, triggerOrdersRefresh};
 };
