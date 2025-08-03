@@ -7,5 +7,5 @@ services:
       - "5432:5432"
     environment:
       POSTGRES_DB: ecommerce_db
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: admin
+      POSTGRES_USER: ecommerce20503
+      POSTGRES_PASSWORD: ecommerce20503

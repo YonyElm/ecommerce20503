@@ -15,6 +15,8 @@ provider "aws" {
 # VPC
 resource "aws_vpc" "main" {
   cidr_block = "10.0.0.0/16"
+  enable_dns_support   = true
+  enable_dns_hostnames = true
   tags = {
     Name = "main-vpc"
   }
@@ -29,6 +31,13 @@ resource "aws_subnet" "main" {
   tags = {
     Name = "main-subnet"
   }
+}
+
+resource "aws_subnet" "subnet_az_backup_rule" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.2.0/24"
+  map_public_ip_on_launch = true
+  availability_zone       = "us-west-2b"
 }
 
 # Internet Gateway
@@ -89,44 +98,52 @@ resource "aws_security_group" "allow_web" {
 
 # EC2 Instance
 resource "aws_instance" "app_server" {
-  ami                         = data.aws_ami.amazon_linux_2.id
+  ami                         = data.aws_ami.ubuntu-22.id
   instance_type               = "t2.micro"
   subnet_id                   = aws_subnet.main.id
-  vpc_security_group_ids      = [aws_security_group.allow_web.id]
+  vpc_security_group_ids = [
+    aws_security_group.allow_web.id,
+    aws_security_group.db_sg.id
+  ]
   associate_public_ip_address = true
 
   user_data = <<-EOF
               #!/bin/bash
               set -e
 
-              sudo yum update
-              sudo amazon-linux-extras enable nginx1
-              sudo amazon-linux-extras enable nodejs12
-              sudo yum clean metadata
-              sudo yum install -y nginx git unzip vim wget curl maven postgresql nodejs
-              wget https://corretto.aws/downloads/latest/amazon-corretto-21-x64-linux-jdk.rpm
-              sudo yum localinstall -y amazon-corretto-21-x64-linux-jdk.rpm
+              sudo apt update && sudo apt upgrade -y
+              sudo apt install -y nginx git unzip vim wget curl maven postgresql-client openjdk-21-jdk
+              curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+              sudo apt install -y nodejs npm
               java -version
-              
-              mkdir /home/ec2-user/
-              git clone --branch aws-test https://github.com/YonyElm/ecommerce20503 /home/ec2-user/ecommerce20503
+              node -v
+              npm -v
+
+              mkdir /home/ubuntu/
+              git clone --branch aws-test https://github.com/YonyElm/ecommerce20503 /home/ubuntu/ecommerce20503
 
               # Build React frontend
-              cd /home/ec2-user/ecommerce20503/frontend
+              cd /home/ubuntu/ecommerce20503/frontend
               npm install
               npm run build
 
               # Copy frontend build to NGINX directory
-              mkdir -p /home/ec2-user/frontend
-              cp -r build/* /home/ec2-user/frontend/
+              mkdir -p /home/ubuntu/frontend
+              cp -r build/* /home/ubuntu/frontend/
 
               # Update NGINX config
               sudo mkdir -p /etc/nginx/sites-available/default
-              sudo cp /home/ec2-user/ecommerce20503/deployment/nginx.conf /etc/nginx/sites-available/default
+              sudo cp /home/ubuntu/ecommerce20503/deployment/nginx.conf /etc/nginx/sites-available/default
               sudo systemctl restart nginx
 
+              # Wait for DB to be ready
+              until pg_isready -h ${aws_db_instance.default.address} -p 5432 -U admin; do
+                echo "Waiting for database..."
+                sleep 5
+              done
+
               # Build and run backend
-              cd /home/ec2-user/ecommerce20503/backend
+              cd /home/ubuntu/ecommerce20503/backend
               mvn clean package -DskipTests
               nohup java -jar target/*.jar --spring.profiles.active=prod > /var/log/backend.log 2>&1 &
               EOF
@@ -136,14 +153,69 @@ resource "aws_instance" "app_server" {
   }
 }
 
-# Set an AMI Image - "amazon_linux_2" machine
-data "aws_ami" "amazon_linux_2" {
-  most_recent  = true
-  owners       = ["amazon"]
+# Set an AMI Image - "ubuntu-22" machine
+data "aws_ami" "ubuntu-22" {
+  most_recent = true
+  owners      = ["099720109477"] # Canonical (Ubuntu) official owner ID
 
   filter {
     name   = "name"
-    values = ["amzn2-ami-hvm*"]
+    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
+  }
+}
+
+data "aws_rds_engine_version" "postgres_14" {
+  engine  = "postgres"
+  version = "14"
+  default_only = true
+}
+
+resource "aws_db_instance" "default" {
+  identifier         = "ecommerce-db"
+  engine             = "postgres"
+  engine_version     = data.aws_rds_engine_version.postgres_14.version  # Use the dynamic value
+  instance_class     = "db.t3.micro"    # Free tier compatible
+  allocated_storage  = 20
+  storage_type       = "gp2"
+  username           = "ecommerce20503"
+  password           = "ecommerce20503"          
+  db_name            = "ecommerce_db"
+  publicly_accessible = true            # Or false if private subnet
+  vpc_security_group_ids = [aws_security_group.db_sg.id]
+  db_subnet_group_name = aws_db_subnet_group.default.name
+  skip_final_snapshot = true
+
+  tags = {
+    Name = "ecommerce-db"
+  }
+}
+
+resource "aws_security_group" "db_sg" {
+  name        = "allow_db_access"
+  vpc_id      = aws_vpc.main.id
+
+  ingress {
+    description = "Allow Postgres from EC2"
+    from_port   = 5432
+    to_port     = 5432
+    protocol    = "tcp"
+    security_groups = [aws_security_group.allow_web.id]  # Allow from EC2's SG
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+resource "aws_db_subnet_group" "default" {
+  name       = "my-db-subnet-group"
+  subnet_ids = [aws_subnet.main.id, aws_subnet.subnet_az_backup_rule.id]
+
+  tags = {
+    Name = "My DB subnet group"
   }
 }
 
