@@ -38,13 +38,22 @@ public class OrdersPageService {
         this.roleDAO = roleDAO;
     }
 
-    public ResponseEntity<ApiResponse<List<OrderViewModel>>> getOrdersByUserId(int userId) {
+    public ResponseEntity<ApiResponse<List<OrderViewModel>>> getOrdersByUserId(int userId, boolean fetchAll) {
 
         ResponseEntity<ApiResponse<List<OrderViewModel>>> adminAccess = ApiResponse.checkAdminAccess(userId, "change order status", roleDAO);
 
-        List<Order> orders = orderDAO.findByUserId(userId);
+        // Not Admin but asked to fetch all
+        if (adminAccess != null && fetchAll) {
+            return ApiResponse.errorResponse("0", "Unauthorized action by UserId" + userId, HttpStatus.UNAUTHORIZED);
+        }
+        List<Order> orders;
+        if (adminAccess == null && fetchAll) {
+            orders = orderDAO.findAll();
+        } else {
+            orders = orderDAO.findByUserId(userId);
+        }
         if (orders == null || orders.isEmpty()) {
-            return ApiResponse.errorResponse("0", "Ordered not found for user", HttpStatus.NOT_FOUND);
+            return ApiResponse.errorResponse("1", "Ordered not found for user", HttpStatus.NOT_FOUND);
         }
 
         List<OrderViewModel> bodyForResponse = orders.stream().map(order -> {

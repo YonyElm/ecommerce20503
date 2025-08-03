@@ -24,8 +24,10 @@ public class OrdersController {
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<OrderViewModel>>>  getOrdersPage(@RequestHeader("userId") int userId) {
-        return ordersPageService.getOrdersByUserId(userId);
+    public ResponseEntity<ApiResponse<List<OrderViewModel>>>  getOrdersPage(@RequestHeader("userId") int userId,
+                                                                            @RequestParam(defaultValue = "false") boolean fetchAll) {
+
+        return ordersPageService.getOrdersByUserId(userId, fetchAll);
     }
 
     @PutMapping("/{orderItemId}/status")
