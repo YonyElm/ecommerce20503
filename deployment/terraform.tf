@@ -100,11 +100,13 @@ resource "aws_instance" "app_server" {
               set -e
 
               sudo yum update
-              sudo amazon-linux-extras enable corretto17
               sudo amazon-linux-extras enable nginx1
               sudo amazon-linux-extras enable nodejs12
               sudo yum clean metadata
-              sudo yum install -y java-17-amazon-corretto-devel nginx git unzip vim wget curl maven postgresql nodejs
+              sudo yum install -y nginx git unzip vim wget curl maven postgresql nodejs
+              wget https://corretto.aws/downloads/latest/amazon-corretto-21-x64-linux-jdk.rpm
+              sudo yum localinstall -y amazon-corretto-21-x64-linux-jdk.rpm
+              java -version
               
               mkdir /home/ec2-user/
               git clone --branch aws-test https://github.com/YonyElm/ecommerce20503 /home/ec2-user/ecommerce20503
