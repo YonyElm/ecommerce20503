@@ -99,7 +99,7 @@ resource "aws_security_group" "allow_web" {
 # EC2 Instance
 resource "aws_instance" "app_server" {
   ami                         = data.aws_ami.ubuntu-22.id
-  instance_type               = "t2.micro"
+  instance_type               = "t3.medium" # 2 vCPUs, 4 GiB RAM needed for the application
   subnet_id                   = aws_subnet.main.id
   vpc_security_group_ids = [
     aws_security_group.allow_web.id,
@@ -114,7 +114,7 @@ resource "aws_instance" "app_server" {
               sudo apt update && sudo apt upgrade -y
               sudo apt install -y nginx git unzip vim wget curl maven postgresql-client openjdk-21-jdk
               curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-              sudo apt install -y nodejs npm
+              sudo apt install -y nodejs
               java -version
               node -v
               npm -v
@@ -124,15 +124,15 @@ resource "aws_instance" "app_server" {
 
               # Build React frontend
               cd /home/ubuntu/ecommerce20503/frontend
-              npm install
-              npm run build
+              npm installmemory of t2.
+              NODE_OPTIONS="--max_old_space_size=2048" npm run build
 
               # Copy frontend build to NGINX directory
               mkdir -p /home/ubuntu/frontend
               cp -r build/* /home/ubuntu/frontend/
 
               # Update NGINX config
-              sudo mkdir -p /etc/nginx/sites-available/default
+              sudo mkdir -p /etc/nginx/sites-available/
               sudo cp /home/ubuntu/ecommerce20503/deployment/nginx.conf /etc/nginx/sites-available/default
               sudo systemctl restart nginx
 
@@ -145,7 +145,7 @@ resource "aws_instance" "app_server" {
               # Build and run backend
               cd /home/ubuntu/ecommerce20503/backend
               mvn clean package -DskipTests
-              nohup java -jar target/*.jar --spring.profiles.active=prod > /var/log/backend.log 2>&1 &
+              nohup java -jar target/*.jar --spring.profiles.active=prod > backend.log 2>&1 &
               EOF
 
   tags = {
