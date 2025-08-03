@@ -30,7 +30,7 @@ public class OrdersController {
 
     @PutMapping("/{orderItemId}/status")
     public ResponseEntity<ApiResponse<OrderItemWithStatusViewModel.StatusViewModel>> updateOrderItemStatus(
-        @RequestHeader("userId") int adminUserId,
+        @RequestHeader("userId") int userId,
         @PathVariable int orderItemId,
         @RequestBody Map<String, String> body) {
 
@@ -43,6 +43,6 @@ public class OrdersController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ApiResponse<>(false, null, error));
         }
 
-        return ordersPageService.updateOrderItemStatus(adminUserId, orderItemId, newStatus);
+        return ordersPageService.updateOrderItemStatus(userId, orderItemId, newStatus);
     }
 }

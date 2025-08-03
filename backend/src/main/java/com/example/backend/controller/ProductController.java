@@ -6,8 +6,10 @@ import com.example.backend.service.HomeProductsService;
 import com.example.backend.service.StoreService;
 import com.example.backend.viewModel.DetailPageViewModel;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import com.example.backend.utils.ApiValidator;
 
 import java.net.URI;
@@ -53,21 +55,41 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
 
-    @PostMapping
-    public ResponseEntity<DetailPageViewModel> addProduct(
+    // Add Product (multipart support)
+    @PostMapping(consumes = {"multipart/form-data"})
+    public ResponseEntity<DetailPageViewModel> addProductMultipart(
+            @RequestParam Map<String, String> productData,
+            @RequestPart(value = "image", required = false) MultipartFile image,
+            @RequestHeader("userId") String userIdStr) {
+        return handleAddOrUpdateProduct(Optional.empty(), productData, userIdStr, image);
+    }
+
+    // Add Product (JSON support, fallback)
+    @PostMapping(consumes = "application/json")
+    public ResponseEntity<DetailPageViewModel> addProductJson(
             @RequestBody Map<String, String> productData,
             @RequestHeader("userId") String userIdStr) {
 
-        return handleAddOrUpdateProduct(Optional.empty(), productData, userIdStr);
+        return handleAddOrUpdateProduct(Optional.empty(), productData, userIdStr, null);
     }
 
-    @PutMapping("/{productId}")
-    public ResponseEntity<DetailPageViewModel> updateProduct(
+    // Update Product (multipart support)
+    @PutMapping(path="/{productId}", consumes = {"multipart/form-data"})
+    public ResponseEntity<DetailPageViewModel> updateProductMultipart(
+            @PathVariable int productId,
+            @RequestParam Map<String, String> productData,
+            @RequestPart(value = "image", required = false) MultipartFile image,
+            @RequestHeader("userId") String userId) {
+        return handleAddOrUpdateProduct(Optional.of(productId), productData, userId, image);
+    }
+
+    // Update Product (JSON support, fallback)
+    @PutMapping(path="/{productId}", consumes = "application/json")
+    public ResponseEntity<DetailPageViewModel> updateProductJson(
             @PathVariable int productId,
             @RequestBody Map<String, String> productData,
             @RequestHeader("userId") String userId) {
-
-        return handleAddOrUpdateProduct(Optional.of(productId), productData, userId);
+        return handleAddOrUpdateProduct(Optional.of(productId), productData, userId, null);
     }
 
     @DeleteMapping("/{productId}")
@@ -85,7 +107,8 @@ public class ProductController {
         return storeService.deleteProduct(userId, productId);
     }
 
-    private ResponseEntity<DetailPageViewModel> handleAddOrUpdateProduct(Optional<Integer> id, Map<String, String> productData, String userIdStr) {
+    private ResponseEntity<DetailPageViewModel> handleAddOrUpdateProduct(
+            Optional<Integer> productId, Map<String, String> productData, String userIdStr, MultipartFile image) {
         String name = productData.get("name");
         String priceStr = productData.get("price");
 
@@ -103,11 +126,11 @@ public class ProductController {
             return ResponseEntity.badRequest().build();
         }
 
-        if (id.isPresent()) {
-            DetailPageViewModel updated = storeService.updateStoreProduct(userId, id.get(), productData);
-            return ResponseEntity.ok(updated);
+        if (productId.isPresent()) {
+            DetailPageViewModel updated = storeService.updateStoreProduct(userId, productId.get(), productData, image);
+            return ResponseEntity.status(HttpStatus.OK).body(updated);
         } else {
-            DetailPageViewModel created = storeService.addStoreProduct(userId, productData);
+            DetailPageViewModel created = storeService.addStoreProduct(userId, productData, image);
             return ResponseEntity
                     .created(URI.create("/api/products/" + created.getId()))
                     .body(created);

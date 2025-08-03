@@ -7,12 +7,16 @@ import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.core.io.ResourceLoader;
 
 import java.math.BigDecimal;
 import java.util.*;
+import java.io.File;
+import java.io.IOException;
 
 @Service
 public class StoreService {
@@ -23,17 +27,21 @@ public class StoreService {
     private final InventoryDAO inventoryDAO;
     private final CategoryDAO categoryDAO;
     private static final Logger logger = LoggerFactory.getLogger(StoreService.class);
-
+    private final ResourceLoader resourceLoader;
+    // Path where files will be stored.
+    private static final String IMAGE_UPLOAD_DIR = "file:../frontend/public/product_assets/";
+    private static final String IMAGE_URL_DIR = "/product_assets/";
 
     @Autowired
     public StoreService(ProductDAO productDAO, UserDAO userDAO,
                         RoleDAO roleDAO, InventoryDAO inventoryDAO,
-                        CategoryDAO categoryDAO) {
+                        CategoryDAO categoryDAO, ResourceLoader resourceLoader) {
         this.productDAO = productDAO;
         this.userDAO = userDAO;
         this.roleDAO = roleDAO;
         this.inventoryDAO = inventoryDAO;
         this.categoryDAO = categoryDAO;
+        this.resourceLoader = resourceLoader;
     }
 
     @Transactional
@@ -81,12 +89,12 @@ public class StoreService {
 
 
     @Transactional
-    public DetailPageViewModel addStoreProduct(int userId, Map<String, String> productData) {
+    public DetailPageViewModel addStoreProduct(int userId, Map<String, String> productData, MultipartFile image) {
         User seller = userDAO.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         Product product = new Product();
-        setProductValues(productData, product);
+        setProductValues(productData, product, image);
         product.setSeller(seller);
 
         Product savedProduct = productDAO.save(product);
@@ -102,7 +110,7 @@ public class StoreService {
     }
 
     @Transactional
-    public DetailPageViewModel updateStoreProduct(int userId, int productId, Map<String, String> productData) {
+    public DetailPageViewModel updateStoreProduct(int userId, int productId, Map<String, String> productData, MultipartFile image) {
         Product existing = productDAO.findByIdAndIsActiveTrue(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
@@ -110,8 +118,7 @@ public class StoreService {
             throw new RuntimeException("Unauthorized operation");
         }
 
-        // Only update allowed fields
-        setProductValues(productData, existing);
+        setProductValues(productData, existing, image);
         Product savedProduct = productDAO.save(existing);
 
         if (productData.containsKey("maxQuantity")) {
@@ -132,7 +139,7 @@ public class StoreService {
         return isAdmin || (product.getSeller() != null && product.getSeller().getId() == userId);
     }
 
-    private void setProductValues(Map<String, String> productData, Product existing) {
+    private void setProductValues(Map<String, String> productData, Product existing, MultipartFile image) {
         if (productData.containsKey("name")) {
             existing.setName(productData.get("name"));
         }
@@ -142,16 +149,44 @@ public class StoreService {
         if (productData.containsKey("price")) {
             existing.setPrice(new BigDecimal(productData.get("price")));
         }
-        if (productData.containsKey("imageURL")) {
-            existing.setImageURL(productData.get("imageURL"));
-        }
 
-        // Optionally set category if your Product entity supports it and category DAO is available
-        if(productData.containsKey("categoryName")) {
+        if (productData.containsKey("categoryName")) {
             String categoryName = productData.get("categoryName");
             Category category = categoryDAO.findFirstByNameIs(categoryName)
                     .orElseThrow(() -> new RuntimeException("Category not found"));
             existing.setCategory(category);
+        }
+
+        if (image != null && !image.isEmpty()) {
+            String imageUrl = saveImageFile(image);
+            existing.setImageURL(imageUrl);
+        }
+    }
+
+    /**
+     * Saves the uploaded image to disk and returns the public path (for your product's imageURL).
+     */
+    private String saveImageFile(MultipartFile image) {
+        File uploadDir;
+        try {
+            String path = resourceLoader.getResource(IMAGE_UPLOAD_DIR).getFile().getAbsolutePath();
+            uploadDir = new File(path);
+        } catch (Exception e) {
+            throw new RuntimeException("Could not resolve uploads directory path", e);
+        }
+        try {
+            String original = image.getOriginalFilename();
+            String ext = "";
+            if (original != null && original.contains(".")) {
+                ext = original.substring(original.lastIndexOf('.'));
+            }
+            String uniqueName = UUID.randomUUID() + "-" + System.currentTimeMillis() + ext;
+            File dest = new File(uploadDir, uniqueName);
+            image.transferTo(dest);
+
+            return IMAGE_URL_DIR  + uniqueName;
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to store image file: " + e.getMessage(), e);
         }
     }
 

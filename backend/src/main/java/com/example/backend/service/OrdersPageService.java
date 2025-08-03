@@ -5,10 +5,7 @@ import com.example.backend.dao.OrderDAO;
 import com.example.backend.dao.OrderItemDAO;
 import com.example.backend.dao.OrderItemStatusDAO;
 import com.example.backend.dao.RoleDAO;
-import com.example.backend.model.Order;
-import com.example.backend.model.OrderItem;
-import com.example.backend.model.OrderItemStatus;
-import com.example.backend.model.Product;
+import com.example.backend.model.*;
 import com.example.backend.viewModel.OrderItemWithStatusViewModel;
 import com.example.backend.viewModel.OrderViewModel;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -113,25 +110,41 @@ public class OrdersPageService {
     }
     
     @Transactional
-    public ResponseEntity<ApiResponse<OrderItemWithStatusViewModel.StatusViewModel>> updateOrderItemStatus(int adminUserId, int orderItemId, OrderItemStatus.Status newStatus) {
-        ResponseEntity<ApiResponse<OrderItemStatus>> accessCheck = ApiResponse.checkAdminAccess(adminUserId, "update order item status", roleDAO);
-        //TBD - not only admin!
+    public ResponseEntity<ApiResponse<OrderItemWithStatusViewModel.StatusViewModel>> updateOrderItemStatus(int userId, int orderItemId, OrderItemStatus.Status newStatus) {
+        ResponseEntity<ApiResponse<OrderItemStatus>> accessCheck = ApiResponse.checkAdminAccess(userId, "update order item status", roleDAO);
+
+        Optional<OrderItem> optionalOrderItem =  orderItemDAO.findById(orderItemId);
+        if (optionalOrderItem.isEmpty()) {
+            return ApiResponse.errorResponse("1", "Cant find orderItemId:" + orderItemId, HttpStatus.NOT_FOUND);
+        }
+        OrderItem orderItem = optionalOrderItem.get();
+
+        // When not an Admin, make sure target resource belongs to performing user
         if (accessCheck != null) {
-//            orderDAO.findByOredItem
-            return ApiResponse.errorResponse("1", "Unauthorized", HttpStatus.UNAUTHORIZED);
+            Order relevantOrder = orderItem.getOrder();
+            User relevantUser = relevantOrder.getUser();
+            if (relevantUser.getId() != userId) {
+                return ApiResponse.errorResponse("2", "User is not authorized to perform action on:" + orderItemId, HttpStatus.UNAUTHORIZED);
+            }
         }
 
-        Optional<OrderItem> orderItemOpt = orderItemDAO.findById(orderItemId);
-        if (orderItemOpt.isEmpty()) {
-            return ApiResponse.errorResponse("2", "Order item not found", HttpStatus.NOT_FOUND);
+        // Check newStatus is valid
+        OrderItemStatus lastStatus = orderItemStatusDAO.findTopByOrderItemIdOrderByUpdatedAtDesc(orderItem.getId());
+        List<OrderItemStatus.Status> expectedNextSteps = determineNextSteps(lastStatus.getStatus(), (accessCheck==null));
+        if (!expectedNextSteps.contains(newStatus) || lastStatus.getStatus().equals(newStatus)) {
+            return ApiResponse.errorResponse("3", "Cant move status from:" + lastStatus.getStatus() + " to "
+                    + newStatus, HttpStatus.BAD_REQUEST);
         }
 
+        // Perform action
         OrderItemStatus status = OrderItemStatus.builder()
-                .orderItem(orderItemOpt.get())
+                .orderItem(orderItem)
                 .status(newStatus)
                 .updatedAt(java.time.LocalDateTime.now())
                 .build();
         OrderItemStatus savedStatus = orderItemStatusDAO.save(status);
+
+        // Return ViewModel to Frontend
         OrderItemWithStatusViewModel.StatusViewModel responseObject = OrderItemWithStatusViewModel.StatusViewModel.builder()
             .nextSteps(determineNextSteps(savedStatus.getStatus(), (accessCheck==null)))
             .status(savedStatus.getStatus())
