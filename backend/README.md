@@ -50,7 +50,7 @@ mvn clean install
 ### 4. Run the Backend
 
 ```bash
-mvn spring-boot:run
+mvn spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=prod" 
 ```
 
 The backend server will start at [http://localhost:8080](http://localhost:8080).
@@ -100,7 +100,9 @@ mvn test
 To enable remote debugging (port 5005):
 
 ```bash
-mvn spring-boot:run -Dspring-boot.run.jvmArguments="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005"
+mvn spring-boot:run \
+  -Dspring-boot.run.arguments="--spring.profiles.active=dev" \
+  -Dspring-boot.run.jvmArguments="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005"
 ```
 
 Attach your IDE to `localhost:5005`.
