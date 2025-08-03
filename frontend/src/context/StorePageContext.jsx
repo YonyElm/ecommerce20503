@@ -4,44 +4,51 @@ import { addProduct, updateProduct, deleteProduct } from "../api/products";
 import { AuthContext } from "./AuthContext";
 import { useNavigate } from "react-router-dom";
 
-/**
- * Fetches and manages the user's store products,
- * and all UI-related state/handlers for the Store page.
- */
 export function StorePageContext() {
   const authContext = useContext(AuthContext);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!authContext.loading) {
-      const user = authContext.user;
-      if (!user || (user.roleName !== "ADMIN" && user.roleName !== "SELLER")) {
-        navigate("/");
-      }
-    }
-  }, [authContext.user, authContext.loading, navigate]);
-
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!authContext.user) return;
     setLoading(true);
+    if (!authContext.user) {
+      return;
+    }
+
+    const userContext = authContext.user;
+    if (!userContext ||
+      (userContext.roleName !== "ADMIN" && userContext.roleName !== "SELLER")) {
+      setLoading(false);
+      navigate("/");
+      return;
+    }
+
+    if (!userContext.sub) {
+      setProducts([]);
+      setCategories([]);
+      setLoading(false);
+      return;
+    }
+
     getStore(authContext.user.sub)
       .then((res) => {
         if (res && res.data) {
           setProducts(res.data.products || []);
           setCategories(res.data.categories || []);
         }
-        setLoading(false);
       })
       .catch((err) => {
+        setProducts([]);
+        setCategories([]);
         setError(err);
+      })
+      .finally(() => {
         setLoading(false);
       });
-  }, [authContext.user]);
+  }, [authContext.user, authContext.loading, navigate]);
 
   // MODAL state and handlers for Add/Edit Product
   const [isProductModalOpen, setIsProductModalOpen] = useState(false);
@@ -62,22 +69,46 @@ export function StorePageContext() {
     setEditingProduct(null);
   };
 
-  const handleSubmitProduct = async (product) => {
-      if (editingProduct && editingProduct.id) {
-        const res = await updateProduct(authContext.user.sub, editingProduct.id, product);
-        setProducts((items) =>
-          items.map((productItem) => {
-            if (productItem.id === editingProduct.id) {
-              return res.data;
-            }
-            return productItem;
-          })
+  const handleSubmitProduct = async (product, file) => {
+    const userId = authContext.user.sub;
+    let res;
+
+    // If a file exists, use FormData; otherwise, use the product object directly.
+    let requestData;
+    if (file) {
+      requestData = new FormData();
+      Object.entries(product).forEach(([key, value]) => {
+        requestData.append(key, value);
+      });
+      requestData.append("image", file);
+    } else {
+      requestData = product;
+    }
+
+    // Determine which API function to call and execute it.
+    const isUpdating = editingProduct && editingProduct.id;
+    if (isUpdating) {
+      res = await updateProduct(userId, editingProduct.id, requestData, !!file);
+    } else {
+      res = await addProduct(userId, requestData, !!file);
+    }
+
+    // Update the product list based on the response.
+    if (res.data) {
+      setProducts((items) => {
+        // Find and replace the updated product, or add the new one.
+        const updatedList = items.map((productItem) =>
+          productItem.id === res.data.id ? res.data : productItem
         );
-      } else {
-        const res = await addProduct(authContext.user.sub, product);
-        setProducts((prev) => [...prev, res.data]);
-      }
-      handleCloseProductModal();
+        // If the product wasn't in the list (i.e., a new product), add it.
+        if (!isUpdating) {
+          return [...updatedList, res.data];
+        }
+        return updatedList;
+      });
+    }
+
+    handleCloseProductModal();
   };
 
   const handleDeleteProduct = async (productId) => {

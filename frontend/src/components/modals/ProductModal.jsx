@@ -8,6 +8,7 @@ import {
   Button as MuiButton,
   Box,
   MenuItem,
+  Typography,
 } from "@mui/material";
 
 const DEFAULT_FORM = {
@@ -24,10 +25,14 @@ const REQUIRED_FIELDS = ["name", "price", "maxQuantity", "categoryName", "descri
 export default function ProductModal({ open, onClose, onSubmit, product, categories = [] }) {
   const [form, setForm] = React.useState(product || DEFAULT_FORM);
   const [errors, setErrors] = React.useState({});
+  const [selectedFile, setSelectedFile] = React.useState(null);
+  const [fileError, setFileError] = React.useState("");
 
   React.useEffect(() => {
     setForm(product || DEFAULT_FORM);
     setErrors({});
+    setSelectedFile(null);
+    setFileError("");
   }, [product, open]);
 
   const handleChange = (e) => {
@@ -39,6 +44,23 @@ export default function ProductModal({ open, onClose, onSubmit, product, categor
       ...prev,
       [e.target.name]: false,
     }));
+  };
+
+  const handleFileChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) {
+      setSelectedFile(null);
+      setFileError("");
+      return;
+    }
+    if (file.size > 0.5 * 1024 * 1024) {
+      setSelectedFile(null);
+      setFileError("Image size must be below 0.5MB");
+    } else {
+      setSelectedFile(file);
+      setFileError("");
+      setForm((prev) => ({ ...prev, imageURL: "" }));
+    }
   };
 
   const handleSubmit = (e) => {
@@ -61,13 +83,15 @@ export default function ProductModal({ open, onClose, onSubmit, product, categor
 
     setErrors(newErrors);
 
-    if (Object.keys(newErrors).length === 0) {
+    // Don't submit if errors or image too large
+    if (Object.keys(newErrors).length === 0 && !fileError) {
       const submitData = {
         ...form,
         price: Number(form.price),
         maxQuantity: Number(form.maxQuantity),
       };
-      onSubmit(submitData);
+      // Pass both data and selectedFile to onSubmit
+      onSubmit(submitData, selectedFile);
     }
   };
 
@@ -167,16 +191,37 @@ export default function ProductModal({ open, onClose, onSubmit, product, categor
               ))
             )}
           </TextField>
-          <TextField
-            label="Image URL"
-            name="imageURL"
-            value={form.imageURL}
-            onChange={handleChange}
-            fullWidth
-            margin="normal"
-            size="small"
-            helperText="Optional"
-          />
+
+          {/* File input for image */}
+          <Box sx={{ mt: 2, mb: 1 }}>
+            <input
+              accept="image/*"
+              type="file"
+              id="image-upload"
+              style={{ display: "none" }}
+              onChange={handleFileChange}
+            />
+            <label htmlFor="image-upload">
+              <MuiButton variant="outlined" component="span">
+                Choose Product Image
+              </MuiButton>
+            </label>
+            {selectedFile && (
+              <Typography
+                variant="body2"
+                color="text.secondary"
+                sx={{ ml: 2 }}
+              >
+                {selectedFile.name} (
+                {(selectedFile.size / 1024).toFixed(1)} KB)
+              </Typography>
+            )}
+            {fileError && (
+              <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+                {fileError}
+              </Typography>
+            )}
+          </Box>
         </Box>
       </DialogContent>
       <DialogActions>

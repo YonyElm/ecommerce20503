@@ -80,7 +80,6 @@ export const OrdersContext = () => {
       return;
     }
 
-    setLoading(true);
     getOrdersPage(authContext.user.sub)
       .then((res) => {
         if (res.data.success) {

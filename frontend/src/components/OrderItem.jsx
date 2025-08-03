@@ -85,7 +85,7 @@ const OrderProduct = ({ item, status, triggerOrdersRefresh }) => {
           </Grid>
           <Grid>
             <Stack direction="row" alignItems="center" spacing={1}>
-              {status?.[0]?.status && (
+              {status?.[0]?.nextSteps.length > 0 && (
                 <Box>
                   <Button variant="outlined" size="small" endIcon={<ArrowDropDownIcon />} onClick={handleMenuOpen}>
                     Actions
