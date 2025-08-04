@@ -223,7 +223,25 @@ resource "aws_db_subnet_group" "default" {
   }
 }
 
+resource "aws_route53_record" "rds_cname" {
+  zone_id = data.aws_route53_zone.main.zone_id
+  name    = "db.ecommerce20503.com"
+  type    = "CNAME"
+  ttl     = 300
+  records = [aws_db_instance.default.address]
+}
+
+data "aws_route53_zone" "main" {
+  name         = "ecommerce20503.com"
+  private_zone = false
+}
+
 output "app_url" {
   value       = "http://${aws_instance.app_server.public_ip}"
   description = "Access your app in a browser via public IP"
+}
+
+output "rds_endpoint" {
+  value       = aws_db_instance.default.address
+  description = "PostgreSQL RDS endpoint"
 }
