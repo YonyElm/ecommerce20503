@@ -128,6 +128,13 @@ resource "aws_instance" "app_server" {
               npm install
               NODE_OPTIONS="--max_old_space_size=2048" npm run build
 
+              # Give execute (x) permission to traverse folders
+              sudo chmod o+rx /home
+              sudo chmod o+rx /home/ubuntu
+              sudo chmod o+rx /home/ubuntu/ecommerce20503
+              sudo chmod o+rx /home/ubuntu/ecommerce20503/frontend
+              sudo chmod -R o+rx /home/ubuntu/ecommerce20503/frontend/build
+
               # Update NGINX config
               sudo mkdir -p /etc/nginx/sites-available/
               sudo cp /home/ubuntu/ecommerce20503/deployment/nginx.conf /etc/nginx/sites-available/default
