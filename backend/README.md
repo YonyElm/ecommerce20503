@@ -50,7 +50,7 @@ mvn clean install
 ### 4. Run the Backend
 
 ```bash
-mvn spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=prod" 
+mvn spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=gamma"
 ```
 
 The backend server will start at [http://localhost:8080](http://localhost:8080).

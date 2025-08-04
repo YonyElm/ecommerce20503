@@ -37,3 +37,5 @@ ln -sfn $(brew --prefix)/bin/docker-compose ~/.docker/cli-plugins/docker-compose
 
 
 docker-compose -f docker-compose.yml up  -d
+
+Deployment takes ~15 minutes
