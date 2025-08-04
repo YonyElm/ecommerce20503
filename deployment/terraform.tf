@@ -113,7 +113,9 @@ resource "aws_instance" "app_server" {
 
               sudo apt update && sudo apt upgrade -y
               sudo apt install -y nginx git unzip vim wget curl maven postgresql-client openjdk-21-jdk
-              curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+              sleep 1
+              sudo curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+              sleep 1
               sudo apt install -y nodejs
               java -version
               node -v
@@ -124,12 +126,8 @@ resource "aws_instance" "app_server" {
 
               # Build React frontend
               cd /home/ubuntu/ecommerce20503/frontend
-              npm installmemory of t2.
+              npm install
               NODE_OPTIONS="--max_old_space_size=2048" npm run build
-
-              # Copy frontend build to NGINX directory
-              mkdir -p /home/ubuntu/frontend
-              cp -r build/* /home/ubuntu/frontend/
 
               # Update NGINX config
               sudo mkdir -p /etc/nginx/sites-available/
