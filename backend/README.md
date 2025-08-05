@@ -18,13 +18,14 @@ The backend provides RESTful APIs for product browsing, shopping cart, checkout,
 
 ## Tech Stack
 
-- **Java 17+** (or compatible version)
+- **Java 21** (or compatible version)
 - **Spring Boot** (REST API, JPA/Hibernate)
 - **Maven** (build tool)
-- **SQLite** (default, easily swappable)
 - **Lombok** (boilerplate reduction)
 - **JWT** (if enabled, for authentication)
 - **JUnit** (for backend testing)
+- **SQLite** (development, lightweight file-based database)
+- **PostgreSQL** (gamma and production, scalable server-based database)
 
 ---
 
@@ -32,28 +33,36 @@ The backend provides RESTful APIs for product browsing, shopping cart, checkout,
 
 ### 1. Prerequisites
 
-- Java (`java -version`)
+- Java (`java -version`) - Should be 21
 - Maven (`mvn -v`)
 
 ### 2. Install Dependencies
 
+Assuming you are located in `backend` folder
+
 ```bash
-cd backend
 mvn clean install
 ```
 
 ### 3. Configure Database
 
 - The default configuration uses SQLite (`src/main/resources/schema-sqlite.sql`) for development.
-- You can change the database in `src/main/resources/application.properties` if needed.
+- You can change the database in `src/main/resources/application.properties` if needed or via CLI command with one of the options:
+  - dev (default, standalone)
+  - gamma (development setting with PostgreSQL, requires running PostgreSQL server on localhost:5432)
+  - prod (for AWS deployment, will not work locally)
 
 ### 4. Run the Backend
 
 ```bash
-mvn spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=gamma"
+mvn spring-boot:run -Dspring-boot.run.arguments="--spring.profiles.active=dev"
 ```
 
 The backend server will start at [http://localhost:8080](http://localhost:8080).
+
+* 2 Users are already configured in the system:
+  * `admin@example.com` with password `admin`
+  * `john@example.com` with password `john_doe`
 
 ---
 
@@ -111,8 +120,8 @@ Attach your IDE to `localhost:5005`.
 
 ## Development Tips
 
-- **Frontend Integration:** The backend is designed to be consumed by the React frontend in `/frontend`.
-- **Cross-Origin Requests:** CORS is enabled for local development by default.
+- **Frontend Integration:** The backend is designed to be consumed by the React frontend in `/frontend` folder.
+- **Cross-Origin Requests:** CORS is enabled for local development by default, accepting requests from `localhost:3000`.
 - **API Docs:** Consider adding Swagger/OpenAPI for easier API exploration.
 
 ---

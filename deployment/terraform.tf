@@ -121,7 +121,7 @@ resource "aws_instance" "app_server" {
               node -v
               npm -v
 
-              git clone --branch aws-test https://github.com/YonyElm/ecommerce20503 /home/ubuntu/ecommerce20503
+              git clone https://github.com/YonyElm/ecommerce20503 /home/ubuntu/ecommerce20503
 
               # Build React frontend
               cd /home/ubuntu/ecommerce20503/frontend
