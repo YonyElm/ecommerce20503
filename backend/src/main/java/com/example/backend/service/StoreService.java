@@ -7,6 +7,7 @@ import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -28,20 +29,21 @@ public class StoreService {
     private final CategoryDAO categoryDAO;
     private static final Logger logger = LoggerFactory.getLogger(StoreService.class);
     private final ResourceLoader resourceLoader;
-    // Path where files will be stored.
-    private static final String IMAGE_UPLOAD_DIR = "file:../frontend/public/product_assets/";
+    private String imageUploadDir = "file:../frontend/public/product_assets/";
     private static final String IMAGE_URL_DIR = "/product_assets/";
 
     @Autowired
     public StoreService(ProductDAO productDAO, UserDAO userDAO,
                         RoleDAO roleDAO, InventoryDAO inventoryDAO,
-                        CategoryDAO categoryDAO, ResourceLoader resourceLoader) {
+                        CategoryDAO categoryDAO, ResourceLoader resourceLoader,
+                        @Value("${image.upload.dir}") String imageUploadDir) {
         this.productDAO = productDAO;
         this.userDAO = userDAO;
         this.roleDAO = roleDAO;
         this.inventoryDAO = inventoryDAO;
         this.categoryDAO = categoryDAO;
         this.resourceLoader = resourceLoader;
+        this.imageUploadDir = imageUploadDir;
     }
 
     @Transactional
@@ -169,7 +171,7 @@ public class StoreService {
     private String saveImageFile(MultipartFile image) {
         File uploadDir;
         try {
-            String path = resourceLoader.getResource(IMAGE_UPLOAD_DIR).getFile().getAbsolutePath();
+            String path = resourceLoader.getResource(imageUploadDir).getFile().getAbsolutePath();
             uploadDir = new File(path);
         } catch (Exception e) {
             throw new RuntimeException("Could not resolve uploads directory path", e);
