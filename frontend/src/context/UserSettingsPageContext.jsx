@@ -2,7 +2,7 @@ import { useEffect, useState, useContext } from "react";
 import * as api from "../api/userSettings";
 import { AuthContext } from "./AuthContext";
 import { useNavigate } from "react-router-dom";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 
 /**
  * Fetches and manages the user's profile, addresses, payment methods,
@@ -11,13 +11,6 @@ import {jwtDecode} from "jwt-decode";
 export function UserSettingsPageContext() {
   const authContext = useContext(AuthContext);
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (!authContext.loading && !authContext.user) {
-      navigate("/");
-    }
-  }, [authContext.user, authContext.loading, navigate]);
-
   const [profile, setProfile] = useState(null);
   const [addresses, setAddresses] = useState([]);
   const [payments, setPayments] = useState([]);
@@ -25,26 +18,44 @@ export function UserSettingsPageContext() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!authContext.user) return;
     setLoading(true);
-    api.getUserSettings(authContext.user.sub)
+
+    if (authContext.loading) return;
+
+    if (!authContext.user) {
+      navigate("/");
+      setLoading(false);
+      return;
+    }
+
+    const userContext = authContext.user;
+
+    if (!userContext.sub) {
+      setProfile(null);
+      setAddresses([]);
+      setPayments([]);
+      setLoading(false);
+      return;
+    }
+
+    api.getUserSettings(userContext.sub)
       .then((res) => {
-        if (res.data.success) {
-          if (res.data.data) {
-            setProfile(res.data.data.user);
-            setAddresses(res.data.data.addresses || []);
-            setPayments(res.data.data.payments || []);
-          }
+        if (res.data.success && res.data.data) {
+          setProfile(res.data.data.user);
+          setAddresses(res.data.data.addresses || []);
+          setPayments(res.data.data.payments || []);
         } else {
           authContext.logout();
         }
-        setLoading(false);
       })
       .catch((err) => {
+        authContext.logout();
         setError(err);
+      })
+      .finally(() => {
         setLoading(false);
       });
-  }, [authContext]);
+  }, [authContext, navigate]);
 
   const updateProfile = async (data) => {
     const res = await api.updateUserProfile(authContext.user.sub, data);
@@ -89,8 +100,7 @@ export function UserSettingsPageContext() {
     setPayments((prev) => prev.filter((p) => p.id !== paymentId));
   };
 
-  // MODAL state and handlers (logic now all here)
-  // Address Modal
+  // Address Modal State & Handlers
   const [isAddressModalOpen, setIsAddressModalOpen] = useState(false);
   const [editingAddress, setEditingAddress] = useState(null);
 
@@ -110,7 +120,7 @@ export function UserSettingsPageContext() {
   };
 
   const handleSubmitAddress = async (address) => {
-    if (editingAddress && editingAddress.id) {
+    if (editingAddress?.id) {
       await editAddress(editingAddress.id, address);
     } else {
       await addAddress(address);
@@ -118,7 +128,7 @@ export function UserSettingsPageContext() {
     handleCloseAddressModal();
   };
 
-  // Payment Modal
+  // Payment Modal State & Handlers
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [editingPayment, setEditingPayment] = useState(null);
 
@@ -138,7 +148,7 @@ export function UserSettingsPageContext() {
   };
 
   const handleSubmitPayment = async (payment) => {
-    if (editingPayment && editingPayment.id) {
+    if (editingPayment?.id) {
       await editPayment(editingPayment.id, payment);
     } else {
       await addPayment(payment);
@@ -152,13 +162,14 @@ export function UserSettingsPageContext() {
     } else if (authContext?.user?.roleName === "SELLER") {
       navigate("/store");
     }
-  }
+  };
 
-  // Add becomeSeller functionality
   const becomeSeller = async () => {
     try {
-      let result = await api.updateUserRole(authContext.user.sub,
-        { targetUserId: authContext.user.sub,  roleName: "SELLER" });
+      const result = await api.updateUserRole(authContext.user.sub, {
+        targetUserId: authContext.user.sub,
+        roleName: "SELLER",
+      });
       if (result?.data?.token) {
         authContext.login(result.data.token);
       }

@@ -37,7 +37,7 @@ class CheckoutPageServiceTest {
         when(addressDAO.findByUser_IdAndIsActive(userId, true)).thenReturn(addresses);
         when(paymentDAO.findByUser_IdAndIsActive(userId, true)).thenReturn(payments);
         CheckoutPageViewModel result = checkoutPageService.getCheckoutPageDataByUserId(userId);
-        assertEquals(addresses, result.getShipingAddressList());
+        assertEquals(addresses, result.getShippingAddressList());
         assertEquals(payments, result.getPaymentMethodList());
     }
 }

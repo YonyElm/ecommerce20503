@@ -10,6 +10,6 @@ import java.util.List;
 @Getter
 @Setter
 public class CheckoutPageViewModel {
-    private List<Address> shipingAddressList;
+    private List<Address> shippingAddressList;
     private List<Payment> paymentMethodList;
 }

@@ -12,28 +12,36 @@ export function UsersComponentContext() {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (!authContext.loading) {
-      const user = authContext.user;
-      if (!user || user.roleName !== "ADMIN") {
-        navigate("/");
-      } else {
-        setLoading(true);
-        getUsers(authContext.user.sub)
-          .then(res => {
-            let users = res?.data?.users || [];
-            let roleNames = res?.data?.roleNames || [];
-            for (let i = 0; i < users.length; i++) {
-              users[i].roleName = roleNames[i] !== undefined ? roleNames[i] : 'N/A'
-            }
-            setUsers(users || []);
-            setLoading(false);
-          })
-          .catch(err => {
-            setError(err);
-            setLoading(false);
-          });
-      }
+    setLoading(true);
+    if (authContext.loading) {
+      setLoading(false);
+      return;
     }
+
+    const user = authContext.user;
+    if (!user || user.roleName !== "ADMIN") {
+      navigate("/");
+      setLoading(false);
+      return;
+    }
+
+    getUsers(user.sub)
+      .then((res) => {
+        const users = res?.data?.users ?? [];
+        const roleNames = res?.data?.roleNames ?? [];
+
+        const usersJoinRole = users.map((user, i) => ({
+          ...user,
+          roleName: roleNames[i] ?? 'N/A',
+        }));
+
+        setUsers(usersJoinRole);
+      })
+      .catch((err) => {
+        setUsers([])
+        setError(err)
+      })
+      .finally(() => setLoading(false));
   }, [authContext.user, authContext.loading, navigate]);
 
   const handleActivateUser = async (targetUserId, action) => {

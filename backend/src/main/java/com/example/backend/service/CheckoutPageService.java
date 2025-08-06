@@ -28,7 +28,7 @@ public class CheckoutPageService {
 
         CheckoutPageViewModel viewModel = new CheckoutPageViewModel();
 
-        viewModel.setShipingAddressList(addresses);
+        viewModel.setShippingAddressList(addresses);
         viewModel.setPaymentMethodList(payments);
         return viewModel;
     }

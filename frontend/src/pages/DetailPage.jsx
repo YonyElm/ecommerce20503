@@ -1,163 +1,102 @@
-import React, { useContext } from "react";
-import {Link, useNavigate} from "react-router-dom";
-import Spinner from "../components/Spinner";
-import {ChosenQuantityContext, DetailPageContext} from "../context/DetailPageContext";
-import { AuthContext } from "../context/AuthContext";
-import {CartContext} from "../context/CartContext";
+import React from "react";
+import { Link } from "react-router-dom";
+import {DetailPageContext} from "../context/DetailPageContext";
+import PageContainer from "../components/PageContainer";
 import NotFound from "../components/NotFound";
+import { MdImageNotSupported } from "react-icons/md";
+import {Box, Typography, TextField, Button as MuiButton, Grid, Alert, Stack, Link as MUILink} from "@mui/material";
 
-const DetailPage = () => {
-    const { product, isLoading } = DetailPageContext();
-    const [chosenQuantity, handleChosenQuantityChange] = ChosenQuantityContext();
-    const { user: isSignedIn} = useContext(AuthContext);
-    const {cartItems, addItem, updateQuantity} = useContext(CartContext);
-    const navigate = useNavigate();
+export default function DetailPage() {
+    const {product, isLoading, chosenQuantity, handleChosenQuantityChange, isSignedIn, inStock,
+        categoryName, addToCart, buyNow,} = DetailPageContext();
 
     if (isLoading) {
-        return (
-            <div className="flex justify-center items-center h-64">
-                <Spinner />
-            </div>
-        );
+        return <PageContainer loading title="Product Details" />;
     }
 
     if (!product) {
         return (
-            <main className="container mx-auto mt-8 px-4">
-                <NotFound message="Can't find product, Perhaps it is no longer listed for sale." />
-            </main>
+          <PageContainer title="Product Details">
+              <NotFound message="Can't find product, Perhaps it is no longer listed for sale." />
+          </PageContainer>
         );
     }
 
-    const addToCart = () => {
-        if (cartItems.some(item => item.productId === product.id)) {
-            updateQuantity(product.id, chosenQuantity, true);
-        } else {
-            let item = {productId: product.id, name: product.name,
-                price: product.price, quantity: chosenQuantity};
-            addItem(item);
-        }
-        alert(`Added ${chosenQuantity} ${product.name}(s) to cart!`);
-    };
-
-    const buyNow = () => {
-        navigate(`/checkout/${product.id}?quantity=${chosenQuantity}&price=${product.price}`);
-    };
-
-    const inStock = product.maxQuantity > 0;
-    const categoryName = product.categoryName ? product.categoryName : "N/A";
-
     return (
-        <main className="container mx-auto mt-24 px-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 bg-white p-6 rounded-lg shadow border border-gray-200">
-                <div>
-                    <div className="bg-gray-200 flex justify-center items-center h-[400px] w-full rounded text-4xl text-gray-400 mb-4">
-                        {product.imageURL ? (
-                            <img
-                                src={product.imageURL}
-                                alt={product.name}
-                                className="object-contain h-full w-full rounded"
-                            />
-                        ) : (
-                            <span>[Main Product Image]</span>
-                        )}
-                    </div>
-                    <div className="flex gap-2 mt-4">
-                        {product.images && product.images.length > 0
-                            ? product.images.map((img, idx) => (
-                                <img
-                                    key={idx}
-                                    src={img}
-                                    alt={`Thumbnail ${idx + 1}`}
-                                    className="w-16 h-16 bg-gray-200 rounded cursor-pointer object-cover"
-                                />
-                            ))
-                            : [1, 2, 3].map((n) => (
-                                <div
-                                    key={n}
-                                    className="w-16 h-16 bg-gray-200 rounded cursor-pointer flex items-center justify-center text-gray-400"
-                                >
-                                    +
-                                </div>
-                            ))}
-                    </div>
-                </div>
-
-                <div>
-                    <h1 className="text-3xl font-bold text-gray-900 mb-2">{product.name}</h1>
-                    <p className="text-gray-600 text-sm mb-4">Category: {categoryName}</p>
-                    <p className="text-xl font-bold text-gray-900 mb-4">${product.price}</p>
-                    <p className="text-gray-700 mb-6">{product.description}</p>
-
-                    <div className="mb-4">
-                        <span className="text-gray-700 font-semibold">Availability:</span>
-                        {inStock ? (
-                            <span className="text-green-600"> In Stock ({product.maxQuantity} left)</span>
-                        ) : (
-                            <span className="text-red-600"> Out of Stock</span>
-                        )}
-                    </div>
-
-                    <div className="flex items-center gap-4 mb-6">
-                        <label htmlFor="quantity" className={`font-semibold ${!inStock ? "text-gray-400 line-through" : "text-gray-700"}`}>
-                            Quantity:
-                        </label>
-                        <input
-                            type="number"
-                            id="quantity"
-                            name="quantity"
-                            value={chosenQuantity}
+      <PageContainer title="Product Details">
+          <Grid container spacing={4} alignItems="stretch">
+              <Grid item xs={12} sm={6}>
+                  {product.imageURL ? (
+                    <Box component="img" src={product.imageURL} alt={product.name} sx={{height: "100%", width: "100%", objectFit: "contain",}}/>
+                  ) : (
+                    <Box sx={{height: "100%", width: "100%", display: "flex", alignItems: "center", justifyContent: "center", px: 10}}>
+                        <MdImageNotSupported size={64} data-testid="broken-img-icon"/>
+                    </Box>
+                  )}
+              </Grid>
+              <Grid item xs={12} sm={6}>
+                  <Box sx={{display: "flex", flexDirection: "column",}}>
+                      <Typography variant="h4" fontWeight={700} gutterBottom>
+                          {product.name}
+                      </Typography>
+                      <Typography color="text.secondary" variant="subtitle2" gutterBottom>
+                          Category: {categoryName}
+                      </Typography>
+                      <Typography color="primary" variant="h5" fontWeight={600} gutterBottom>
+                          ${product.price}
+                      </Typography>
+                      <Typography variant="body1" color="text.secondary" gutterBottom>
+                          {product.description}
+                      </Typography>
+                      <Box mb={2}>
+                          <Typography component="span" variant="subtitle1" fontWeight={600} sx={{ color: "text.secondary" }}>
+                              Availability:
+                          </Typography>
+                          {inStock ? (
+                            <Typography component="span" fontWeight={600} color="success.main" sx={{ ml: 1 }}>
+                                In Stock ({product.maxQuantity} left)
+                            </Typography>
+                          ) : (
+                            <Typography component="span" fontWeight={600} color="error.main" sx={{ ml: 1 }}>
+                                Out of Stock
+                            </Typography>
+                          )}
+                      </Box>
+                      <Box display="flex" alignItems="center" gap={2} mb={4}>
+                          <Typography fontWeight={600} color={!inStock ? "text.disabled" : "text.primary"}
+                            sx={{ minWidth: 75 }}>
+                              Quantity:
+                          </Typography>
+                          <TextField id="quantity" name="quantity" type="number" size="small" value={chosenQuantity}
                             onChange={handleChosenQuantityChange}
-                            min="1"
-                            max={product.maxQuantity}
-                            className={`border rounded py-1 px-2 w-16 text-center 
-                                ${!inStock ? "bg-gray-100 text-gray-400 cursor-not-allowed" : ""}`}
-                            disabled={!inStock || !isSignedIn}
-                        />
-                    </div>
-
-                    <div className="flex gap-4">
-                        <button
-                            className={`w-full py-2 rounded font-semibold 
-                                ${
-                                    inStock && isSignedIn
-                                        ? "bg-cyan-500 text-white hover:bg-cyan-700"
-                                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                }`}
-                            disabled={!inStock || !isSignedIn}
-                            onClick={addToCart}
-                        >
-                            Add to Cart
-                        </button>
-                        <button
-                            className={`w-full py-2 rounded font-semibold 
-                                ${
-                                    inStock && isSignedIn
-                                        ? "bg-cyan-500 text-white hover:bg-cyan-700"
-                                        : "bg-gray-300 text-gray-500 cursor-not-allowed"
-                                }`}
-                            disabled={!inStock || !isSignedIn}
-                            onClick={buyNow}
-                        >
-                            Buy Now
-                        </button>
-                    </div>
-
-                    {!isSignedIn ?
-                        <p className="mt-6 text-center text-m text-gray-700">
+                            inputProps={{
+                                min: 1,
+                                max: product.maxQuantity,
+                            }}
+                            disabled={!inStock || !isSignedIn} sx={{ width: 80 }}/>
+                      </Box>
+                      <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+                          <MuiButton fullWidth variant="contained" color="primary" size="large"
+                            sx={{ textTransform: "none", width: 150 }} disabled={!inStock || !isSignedIn} onClick={addToCart}>
+                              Add to Cart
+                          </MuiButton>
+                          <MuiButton fullWidth variant="contained" color="secondary" size="large"
+                                     sx={{ textTransform: "none", width: 150  }} disabled={!inStock || !isSignedIn} onClick={buyNow}>
+                              Buy Now
+                          </MuiButton>
+                      </Stack>
+                      {!isSignedIn && (
+                        <Alert severity="info" sx={{ mt: 3 }}>
                             Please{" "}
-                            <Link to="/login" className="text-cyan-500 underline font-medium hover:text-cyan-700">
-                                sign in
-                            </Link>{" "}
-                            to purchase or add items to your cart.
-                        </p>
-                        :
-                        <div></div>
-                    }
-                </div>
-            </div>
-        </main>
+                            <MUILink component={Link} to="/login" color="secondary" underline="hover" fontWeight="medium">
+                                Sign in
+                            </MUILink>
+                            {" "}to purchase or add items to your cart.
+                        </Alert>
+                      )}
+                  </Box>
+              </Grid>
+          </Grid>
+      </PageContainer>
     );
-};
-
-export default DetailPage;
+}

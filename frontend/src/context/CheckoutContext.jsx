@@ -34,21 +34,26 @@ const CheckoutContext = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (authContext.user && authContext.user.sub) {
-      getCheckoutDetailsByUserId(authContext.user.sub)
-        .then(res => {
-          setShippingAddressList(res.data.shipingAddressList || []);
-          setPaymentMethodList(res.data.paymentMethodList || []);
-          setIsLoading(false);
-        })
-        .catch(err => {
-          console.error("Error loading checkout data", err);
-          setIsLoading(false);
-        });
-    } else if (!authContext.loading) {
+    setIsLoading(true);
+    if (!authContext.loading && (!authContext.user || !authContext.user.sub)) {
       setShippingAddressList([]);
       setPaymentMethodList([]);
       setIsLoading(false);
+      return;
+    }
+
+    if (authContext.user?.sub) {
+      getCheckoutDetailsByUserId(authContext.user.sub)
+        .then(res => {
+          const data = res?.data ?? {};
+          setShippingAddressList(data.shippingAddressList || []);
+          setPaymentMethodList(data.paymentMethodList ?? []);
+        })
+        .catch(err => {
+          console.error("Error loading checkout data", err);
+          setShippingAddressList([]);
+          setPaymentMethodList([]);
+        }).finally(() => setIsLoading(false));
     }
   }, [authContext.user, authContext.loading]);
 
