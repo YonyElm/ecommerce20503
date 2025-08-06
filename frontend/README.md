@@ -40,12 +40,16 @@ npm start
 
 ## Project Structure
 
+
 ```
 src/
-├── api/            # API utility functions (communicates with backend)
-├── components/     # React components (ProductList, Cart, Checkout, etc.)
-├── pages/          # Page-level components/views (Home, ProductDetail, CheckoutPage, etc.)
-├── App.js          # Main application component
+├── api/            # API utility functions (Axios config, endpoints for products, cart, orders, users, etc.)
+├── components/     # Reusable React components (ProductCard, CartItem, NavBar, Footer, modals, etc.)
+├── context/        # React Context providers and hooks (Auth, Cart, Orders, Category, etc.)
+├── pages/          # Page-level components/views (Home, ProductDetail, CartPage, CheckoutPage, OrdersPage, AdminPage, etc.)
+├── utils/          # Utility functions (e.g., API validators)
+├── __tests__/      # Unit and integration tests for components and context
+├── App.jsx         # Main application component
 ├── index.js        # Entry point
 ```
 
@@ -53,12 +57,24 @@ src/
 
 ## Core Features
 
-- **Product Browsing:** View and search products by category.
-- **Product Details:** View detailed product information.
-- **User Authentication:** Login and register (connected to Spring Boot backend).
-- **Shopping Cart:** Add, remove, and update product quantities.
-- **Checkout:** Select shipping address and payment method, place orders.
-- **Order History:** View past orders (requires login).
+- **Product Browsing:** View and filter products by category on the Home page.
+- **Product Details:** View detailed product information, including images, price, and stock status.
+- **User Authentication:** Login and register with JWT-based authentication (integrated with Spring Boot backend).
+- **Shopping Cart:** Add, remove, and update product quantities; cart persists for guests and logged-in users.
+- **Checkout:** Select shipping address and payment method, place orders (supports both cart and "Buy Now").
+- **Order History:** View past orders and order details (requires login).
+- **User Settings:** Manage profile, addresses, and payment methods.
+- **Admin & Seller Features:** Admin dashboard for managing users, products, orders, and categories; sellers can manage their own products.
+- **Responsive Design:** Fully responsive UI using Material-UI and Tailwind CSS.
+
+
+### Operational Notes & Demo Experience
+
+- **Fast Onboarding:** For demo and POC purposes, there are no checks or limits on password length or email format during registration/login. Any input will work, making it easy to try the system instantly.
+- **Photo Uploads:** Product image uploads are limited to 0.5MB per file. Larger files will be rejected.
+- **Mock Data Entry:** Adding a new credit card or address in the UI will accept any value. These are for demo/mock experience only and are not validated or used for real transactions.
+
+These choices are intentional to maximize ease of use and speed for reviewers and demo users.
 
 ---
 
@@ -68,6 +84,18 @@ If needed, create a `.env` file in the `frontend/` directory to override default
 ```
 REACT_APP_API_BASE_URL=http://localhost:8080/api
 ```
+
+---
+
+## API & Client Configuration
+
+- The frontend consumes REST APIs exposed by the backend (Spring Boot).
+- All API requests are made via [Axios](https://axios-http.com/) using a pre-configured instance in `src/api/axios.js`.
+- The base URL for API requests is set by the `REACT_APP_API_BASE_URL` environment variable (defaults to `http://localhost:8080/api`).
+- JWT tokens are stored in `localStorage` and automatically attached to API requests via an Axios interceptor.
+- Authentication state and user info are managed via React Context (`src/context/AuthContext.jsx`).
+- API modules in `src/api/` provide functions for products, cart, orders, users, categories, checkout, and user settings.
+- Error handling and loading states are managed in context and page components.
 
 ---
 

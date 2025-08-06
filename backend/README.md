@@ -14,6 +14,18 @@ The backend provides RESTful APIs for product browsing, shopping cart, checkout,
 - **Payments & Shipping:** Payment methods and shipping address APIs
 - **Extensible Database Design:** Easily add new features via well-structured models and DAOs
 
+### Operational Notes: Order Delivery & Status Tracking
+
+- **Automated Delivery Status:**
+  - After purchase, each order item automatically progresses through delivery statuses: `processing` → `shipped` → `delivered`.
+  - Status updates occur every 5 minutes, managed by backend scheduled tasks, to simulate real-time order fulfillment.
+- **User Actions:**
+  - While an item is `processing` or `shipped`, the user may cancel the purchase.
+  - Once an item is `delivered`, the user may return it.
+  - `cancel` and `return` are final states and will not change unless an admin intervenes.
+- **Purpose:**
+  - This flow is intentional to reflect a real-world ecommerce experience and to allow reviewers to demo order lifecycle and user/admin actions.
+
 ---
 
 ## Tech Stack
@@ -68,29 +80,86 @@ The backend server will start at [http://localhost:8080](http://localhost:8080).
 
 ## Project Structure
 
+
 ```
 src/main/java/com/example/backend/
-├── controller/   # REST controllers (API endpoints)
-├── service/      # Business logic services
-├── dao/          # Data access objects (JPA repositories)
-├── model/        # JPA entities (User, Product, Order, etc.)
-├── viewModel/    # View models for frontend integration
+├── controller/   # REST controllers (API endpoints for products, cart, orders, users, categories, checkout, etc.)
+├── service/      # Business logic and application services (HomeProductsService, OrdersPageService, AdminService, etc.)
+├── dao/          # Data access objects (JPA repositories for User, Product, Order, etc.)
+├── model/        # JPA entities (User, Product, Order, CartItem, Address, etc.)
+├── viewModel/    # View models for frontend integration (DTOs for API responses)
+├── utils/        # Utility classes (validation, JWT, password encoding, etc.)
 ```
 
 ---
 
 ## API Overview
 
-- **Base URL:** `/api`
-- **Key Endpoints:**
-    - `/api/products` – Product catalog
-    - `/api/categories` – Product categories
-    - `/api/cart` – Shopping cart management
-    - `/api/orders` – Order creation and history
-    - `/api/checkout` – Checkout page data (shipping & payment options)
-    - `/api/auth` – User login and registration
+## API Overview
 
-Explore the code in the [controller](./src/main/java/com/example/backend/controller/) directory for details.
+- **Base URL:** `/api`
+
+### Main Endpoints
+
+#### Authentication
+- `POST /api/auth/register` – Register a new user (email, password, fullName)
+- `POST /api/auth/login` – Login and receive JWT token
+
+#### Products
+- `GET /api/products` – List all products
+- `GET /api/products/{productId}` – Get product details
+- `GET /api/products/category/{categoryId}` – List products by category
+- `POST /api/products` – Add product (admin/seller, supports multipart or JSON)
+- `PUT /api/products/{productId}` – Update product (admin/seller)
+- `DELETE /api/products/{productId}` – Delete product (admin/seller)
+
+#### Categories
+- `GET /api/categories` – List all categories
+- `POST /api/categories` – Create category (admin)
+- `PUT /api/categories/{categoryId}` – Update category (admin)
+- `DELETE /api/categories/{categoryId}` – Delete category (admin)
+
+#### Cart
+- `GET /api/cart` – Get current user's cart (requires `userId` header)
+- `POST /api/cart/add` – Add/update item in cart (requires `userId` header, productId, quantity)
+- `DELETE /api/cart/remove/{cartItemId}` – Remove item from cart
+
+#### Orders
+- `GET /api/orders` – Get orders for user (requires `userId` header, `fetchAll` param for admin)
+- `PUT /api/orders/{orderItemId}/status` – Update order item status (admin/seller)
+
+#### Checkout
+- `GET /api/checkout` – Get checkout data (addresses, payment methods, etc.)
+- `POST /api/checkout/cart` – Place order for cart
+- `POST /api/checkout/buyitnow` – Place single-product order ("Buy Now")
+
+#### User Settings
+- `GET /api/user-settings` – Get user profile, addresses, and payment methods
+- `PUT /api/user-settings/profile/name` – Update user full name
+- `PUT /api/user-settings/profile/role` – Update user role (admin only)
+- `POST /api/user-settings/addresses` – Add address
+- `PUT /api/user-settings/addresses/{addressId}` – Update address
+- `DELETE /api/user-settings/addresses/{addressId}` – Delete address
+- `POST /api/user-settings/payments` – Add payment method
+- `PUT /api/user-settings/payments/{paymentId}` – Update payment method
+- `DELETE /api/user-settings/payments/{paymentId}` – Delete payment method
+
+#### Users (Admin)
+- `GET /api/users` – List all users (admin only)
+- `PUT /api/users/activate` – Activate/deactivate user (admin only)
+
+#### Store (Seller/Admin)
+- `GET /api/store` – Get products and categories for seller/admin
+
+---
+
+### API Notes
+- Most endpoints require a `userId` header for authentication/authorization.
+- JWT-based authentication is used for secure endpoints.
+- All responses are JSON. Error responses include a message and status code.
+- See the [controller](./src/main/java/com/example/backend/controller/) directory for implementation details.
+
+---
 
 ---
 
@@ -122,7 +191,6 @@ Attach your IDE to `localhost:5005`.
 
 - **Frontend Integration:** The backend is designed to be consumed by the React frontend in `/frontend` folder.
 - **Cross-Origin Requests:** CORS is enabled for local development by default, accepting requests from `localhost:3000`.
-- **API Docs:** Consider adding Swagger/OpenAPI for easier API exploration.
 
 ---
 
