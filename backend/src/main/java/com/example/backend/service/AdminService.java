@@ -25,6 +25,13 @@ public class AdminService {
     private final CategoryDAO categoryDAO;
     private static final Logger logger = LoggerFactory.getLogger(AdminService.class);
 
+
+    /**
+     * Constructor for AdminService.
+     * @param userDAO DAO for user data access
+     * @param roleDAO DAO for role data access
+     * @param categoryDAO DAO for category data access
+     */
     @Autowired
     public AdminService(UserDAO userDAO, RoleDAO roleDAO, CategoryDAO categoryDAO) {
         this.userDAO = userDAO;
@@ -34,10 +41,15 @@ public class AdminService {
 
     //--- Users tab
 
+
+    /**
+     * Retrieves a list of users and their roles if the requesting user is an admin.
+     * @param userId The ID of the requesting user
+     * @return ResponseEntity containing a map of users and their roles, or an error message
+     */
     @Transactional
     public ResponseEntity<Map<String, Object>> getUsers(int userId) {
         Map<String, Object> resultMap = new HashMap<>();
-
         Optional<User> userOptional = userDAO.findById(userId);
         if (userOptional.isEmpty()) {
             logger.warn("User not found");
@@ -62,14 +74,12 @@ public class AdminService {
                             } else {
                                 usersRoles.add(Role.RoleName.SELLER);
                             }
-
                             return true;
                         } else {
                             return false;
                         }
                     })
                     .toList();
-
 
             resultMap.put("users", users);
             resultMap.put("roleNames", usersRoles);
@@ -81,6 +91,14 @@ public class AdminService {
         }
     }
 
+
+    /**
+     * Activates or deactivates a user account, if the requesting user has permission.
+     * @param performingUserId The ID of the user performing the action
+     * @param targetUserId The ID of the user to activate/deactivate
+     * @param action true to activate, false to deactivate
+     * @return ResponseEntity containing the result of the operation
+     */
     @Transactional
     public ResponseEntity<Map<String, Object>> userActivation(int performingUserId,
                                                               int targetUserId,
@@ -115,11 +133,23 @@ public class AdminService {
 
     //--- Categories Tab
 
+
+    /**
+     * Retrieves all categories.
+     * @return List of all Category objects
+     */
     @Transactional
     public List<Category> getAllCategories() {
         return categoryDAO.findAll();
     }
 
+
+    /**
+     * Creates a new category if the user has admin access.
+     * @param userId The ID of the user creating the category
+     * @param categoryName The name of the new category
+     * @return ResponseEntity containing the created Category or an error response
+     */
     @Transactional
     public ResponseEntity<ApiResponse<Category>> createCategory(int userId, String categoryName) {
         ResponseEntity<ApiResponse<Category>> accessCheck = ApiResponse.checkAdminAccess(userId, "create categories", roleDAO);
@@ -131,6 +161,14 @@ public class AdminService {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+
+    /**
+     * Updates the name of a category if the user has admin access.
+     * @param userId The ID of the user updating the category
+     * @param categoryId The ID of the category to update
+     * @param categoryName The new name for the category
+     * @return ResponseEntity containing the updated Category or an error response
+     */
     @Transactional
     public ResponseEntity<ApiResponse<Category>> updateCategory(int userId, int categoryId, String categoryName) {
         ResponseEntity<ApiResponse<Category>> accessCheck = ApiResponse.checkAdminAccess(userId, "update categories", roleDAO);
@@ -149,6 +187,13 @@ public class AdminService {
         return ResponseEntity.ok(response);
     }
 
+
+    /**
+     * Deletes a category if the user has admin access.
+     * @param userId The ID of the user deleting the category
+     * @param categoryId The ID of the category to delete
+     * @return ResponseEntity indicating the result of the operation
+     */
     @Transactional
     public ResponseEntity<ApiResponse<Category>> deleteCategory(int userId, int categoryId) {
         // Check if the user has admin access

@@ -32,6 +32,17 @@ public class StoreService {
     private String imageUploadDir = "file:../frontend/public/product_assets/";
     private static final String IMAGE_URL_DIR = "/product_assets/";
 
+
+    /**
+     * Constructor for StoreService.
+     * @param productDAO DAO for product data access
+     * @param userDAO DAO for user data access
+     * @param roleDAO DAO for role data access
+     * @param inventoryDAO DAO for inventory data access
+     * @param categoryDAO DAO for category data access
+     * @param resourceLoader ResourceLoader for file operations
+     * @param imageUploadDir Directory for image uploads
+     */
     @Autowired
     public StoreService(ProductDAO productDAO, UserDAO userDAO,
                         RoleDAO roleDAO, InventoryDAO inventoryDAO,
@@ -46,6 +57,12 @@ public class StoreService {
         this.imageUploadDir = imageUploadDir;
     }
 
+
+    /**
+     * Retrieves the store data for a user, including products and categories based on user roles.
+     * @param userId The ID of the user
+     * @return Map containing lists of products and categories
+     */
     @Transactional
     public Map<String, Object> getStore(int userId) {
         Map<String, Object> resultMap = new HashMap<>();
@@ -85,11 +102,18 @@ public class StoreService {
             .toList();
         resultMap.put("products", viewModels);
         resultMap.put("categories", categories);
-
         return resultMap;
     }
 
 
+
+    /**
+     * Adds a new product to the store for a seller, including inventory and image upload.
+     * @param userId The ID of the seller
+     * @param productData Map of product data fields
+     * @param image The product image file
+     * @return DetailPageViewModel of the saved product
+     */
     @Transactional
     public DetailPageViewModel addStoreProduct(int userId, Map<String, String> productData, MultipartFile image) {
         User seller = userDAO.findById(userId)
@@ -111,6 +135,15 @@ public class StoreService {
         return toViewModel(savedProduct);
     }
 
+
+    /**
+     * Updates an existing product in the store, including inventory and image upload.
+     * @param userId The ID of the user performing the update
+     * @param productId The ID of the product to update
+     * @param productData Map of product data fields
+     * @param image The product image file
+     * @return DetailPageViewModel of the updated product
+     */
     @Transactional
     public DetailPageViewModel updateStoreProduct(int userId, int productId, Map<String, String> productData, MultipartFile image) {
         Product existing = productDAO.findByIdAndIsActiveTrue(productId)
@@ -133,6 +166,13 @@ public class StoreService {
         return toViewModel(savedProduct);
     }
 
+
+    /**
+     * Checks if the user is an admin or the seller of the product.
+     * @param userId The ID of the user
+     * @param product The product to check
+     * @return true if the user is admin or seller, false otherwise
+     */
     private boolean isAdminOrSeller(int userId, Product product) {
         List<Role> roles = roleDAO.getUserRoles(userId);
         boolean isAdmin = roles.stream()
@@ -141,6 +181,13 @@ public class StoreService {
         return isAdmin || (product.getSeller() != null && product.getSeller().getId() == userId);
     }
 
+
+    /**
+     * Sets the values of a product from the provided data and image.
+     * @param productData Map of product data fields
+     * @param existing The Product object to update
+     * @param image The product image file
+     */
     private void setProductValues(Map<String, String> productData, Product existing, MultipartFile image) {
         if (productData.containsKey("name")) {
             existing.setName(productData.get("name"));
@@ -165,8 +212,11 @@ public class StoreService {
         }
     }
 
+
     /**
-     * Saves the uploaded image to disk and returns the public path (for your product's imageURL).
+     * Saves the uploaded image to disk and returns the public path for the product's imageURL.
+     * @param image The product image file
+     * @return The public URL path to the saved image
      */
     private String saveImageFile(MultipartFile image) {
         File uploadDir;
@@ -192,6 +242,12 @@ public class StoreService {
         }
     }
 
+
+    /**
+     * Converts a Product entity to a DetailPageViewModel, including inventory and category info.
+     * @param product The Product entity
+     * @return The corresponding DetailPageViewModel
+     */
     private DetailPageViewModel toViewModel(Product product) {
         DetailPageViewModel viewModel = new DetailPageViewModel();
         Inventory inventory = inventoryDAO.findByProductId(product.getId())
@@ -210,10 +266,24 @@ public class StoreService {
         return viewModel;
     }
 
+
+    /**
+     * Checks if a list of roles contains a specific role name.
+     * @param roles List of Role objects
+     * @param roleName The RoleName to check for
+     * @return true if the role is present, false otherwise
+     */
     private boolean roleMatch(List<Role> roles, Role.RoleName roleName) {
         return roles.stream().anyMatch(role -> roleName.equals(role.getRoleName()));
     }
 
+
+    /**
+     * Deletes a product (soft delete) if the user is admin or the seller.
+     * @param userId The ID of the user performing the delete
+     * @param productId The ID of the product to delete
+     * @return ResponseEntity indicating the result of the operation
+     */
     @Transactional
     public ResponseEntity<Void> deleteProduct(int userId, int productId) {
 

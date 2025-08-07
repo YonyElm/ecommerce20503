@@ -15,8 +15,17 @@ import java.util.List;
 
 @Repository
 public interface CartItemDAO extends JpaRepository<CartItem, Integer> {
+    /**
+     * Finds all active cart items for a given shopping cart.
+     * @param cart The ShoppingCart object
+     * @return List of active CartItem objects in the cart
+     */
     List<CartItem> findByCartAndIsActiveTrue(ShoppingCart cart);
 
+    /**
+     * Deactivates a cart item by setting its isActive flag to false.
+     * @param cartItemId The ID of the cart item to deactivate
+     */
     @Modifying
     @Transactional
     @Query("UPDATE CartItem c SET c.isActive = false WHERE c.id = :cartItemId")

@@ -26,16 +26,33 @@ public class HomeProductsService {
         this.inventoryDAO = inventoryDAO;
     }
 
+
+    /**
+     * Retrieves all active products, filtering by inventory status.
+     * @return List of all active Product objects with valid inventory
+     */
     @Transactional
     public List<Product> getAllProducts() {
         return filterInventoryStatus(productDAO.findByIsActiveTrue());
     }
 
+
+    /**
+     * Retrieves all active products for a given category, filtering by inventory status.
+     * @param categoryId The ID of the category
+     * @return List of Product objects in the category with valid inventory
+     */
     @Transactional
     public List<Product> getByCategory(int categoryId) {
         return filterInventoryStatus(productDAO.findByCategory_IdAndIsActiveTrue(categoryId));
     }
 
+
+    /**
+     * Filters a list of products to include only those with valid inventory.
+     * @param products List of Product objects to filter
+     * @return List of Product objects with inventory set
+     */
     private List<Product> filterInventoryStatus(List<Product> products) {
         return products.stream().map(product -> {
             try {

@@ -14,6 +14,11 @@ public class ShoppingCartDAO {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    /**
+     * Retrieves the shopping cart for a user, or creates one if it does not exist.
+     * @param userId The ID of the user
+     * @return The ShoppingCart object for the user
+     */
     public ShoppingCart getOrCreateCart(int userId) {
         List<ShoppingCart> carts = jdbcTemplate.query(
                 "SELECT * FROM shopping_cart WHERE user_id = ?",

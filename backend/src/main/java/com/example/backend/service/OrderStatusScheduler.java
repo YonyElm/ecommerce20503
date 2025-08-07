@@ -23,11 +23,21 @@ public class OrderStatusScheduler {
                                                                         OrderItemStatus.Status.shipped);
     private final OrderItemStatusDAO orderItemStatusDAO;
 
+
+    /**
+     * Constructor for OrderStatusScheduler.
+     * @param orderItemStatusDAO DAO for order item status data access
+     */
     @Autowired
     public OrderStatusScheduler(OrderItemStatusDAO orderItemStatusDAO) {
         this.orderItemStatusDAO = orderItemStatusDAO;
     }
 
+
+    /**
+     * Periodically updates the status of eligible order items to the next status (e.g., PROCESSING → SHIPPED → DELIVERED).
+     * Runs every MINUTES interval as scheduled.
+     */
     @Transactional
     @Scheduled(fixedRate = MINUTES * 60 * 1000) // every X minutes
     public void updateOrderItemStatuses() {
@@ -36,7 +46,6 @@ public class OrderStatusScheduler {
         for (OrderItemStatus status : staleStatuses) {
             OrderItemStatus.Status current = status.getStatus();
             OrderItemStatus.Status next = getNextStatus(current);
-
             if (!current.equals(next)) {
                 OrderItemStatus newStatus = OrderItemStatus.builder()
                         .status(next)
@@ -47,6 +56,11 @@ public class OrderStatusScheduler {
         }
     }
 
+    /**
+     * Determines the next status for an order item based on its current status.
+     * @param currentStatus The current status of the order item
+     * @return The next status, or the current status if no further progression
+     */
     private OrderItemStatus.Status getNextStatus(OrderItemStatus.Status currentStatus) {
         return switch (currentStatus) {
             case OrderItemStatus.Status.processing -> OrderItemStatus.Status.shipped;

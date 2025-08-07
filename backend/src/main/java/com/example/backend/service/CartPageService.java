@@ -29,8 +29,13 @@ public class CartPageService {
         this.entityManager = entityManager;
     }
 
-    public List<CartPageItemViewModel> getCartItemsByUserId(int userId) {
 
+    /**
+     * Retrieves the list of cart items for a user.
+     * @param userId The ID of the user
+     * @return List of CartPageItemViewModel representing the user's cart items
+     */
+    public List<CartPageItemViewModel> getCartItemsByUserId(int userId) {
         List<CartPageItemViewModel> cartPageItems = new ArrayList<>();
         ShoppingCart cart = cartDAO.getOrCreateCart(userId);
         cart.setItems(cartItemDAO.findByCartAndIsActiveTrue(cart));
@@ -47,10 +52,16 @@ public class CartPageService {
 
             cartPageItems.add(itemModel);
         }
-
         return cartPageItems;
     }
 
+
+    /**
+     * Adds a new item to the cart or updates the quantity if it already exists.
+     * @param cart The ShoppingCart object
+     * @param productId The ID of the product to add or update
+     * @param quantity The quantity to set for the product
+     */
     @Transactional
     public void addOrUpdateItem(ShoppingCart cart, int productId, int quantity) {
         Optional<CartItem> existing = cartItemDAO.findByCartAndIsActiveTrue(cart).stream()
@@ -72,6 +83,11 @@ public class CartPageService {
         }
     }
 
+
+    /**
+     * Removes an item from the cart by deactivating it.
+     * @param cartItemId The ID of the cart item to remove
+     */
     @Transactional
     public void removeItem(int cartItemId) {
         cartItemDAO.deactivateByCartItemId(cartItemId);

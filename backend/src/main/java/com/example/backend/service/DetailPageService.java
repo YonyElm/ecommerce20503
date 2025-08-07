@@ -21,6 +21,12 @@ public class DetailPageService {
     private final InventoryDAO inventoryDAO;
     private static final Logger logger = LoggerFactory.getLogger(DetailPageService.class);
 
+
+    /**
+     * Constructor for DetailPageService.
+     * @param productDAO DAO for product data access
+     * @param inventoryDAO DAO for inventory data access
+     */
     @Autowired
     public DetailPageService(ProductDAO productDAO,
                           InventoryDAO inventoryDAO) {
@@ -28,6 +34,11 @@ public class DetailPageService {
         this.inventoryDAO = inventoryDAO;
     }
 
+    /**
+     * Retrieves detailed product information by product ID, including category and inventory data.
+     * @param id The ID of the product
+     * @return DetailPageViewModel containing product details, or null if not found
+     */
     @Transactional
     public DetailPageViewModel getProductDetailById(int id) {
         Optional<Product> productOptional = productDAO.findByIdAndIsActiveTrue(id);

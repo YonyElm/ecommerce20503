@@ -27,6 +27,14 @@ public class OrdersPageService {
     private final OrderItemStatusDAO orderItemStatusDAO;
     private final RoleDAO roleDAO;
 
+
+    /**
+     * Constructor for OrdersPageService.
+     * @param orderDAO DAO for order data access
+     * @param orderItemDAO DAO for order item data access
+     * @param orderItemStatusDAO DAO for order item status data access
+     * @param roleDAO DAO for role data access
+     */
     @Autowired
     public OrdersPageService(OrderDAO orderDAO,
                              OrderItemDAO orderItemDAO,
@@ -38,6 +46,13 @@ public class OrdersPageService {
         this.roleDAO = roleDAO;
     }
 
+
+    /**
+     * Retrieves orders for a user, or all orders if the user is an admin and fetchAll is true.
+     * @param userId The ID of the user requesting orders
+     * @param fetchAll Whether to fetch all orders (admin only)
+     * @return ResponseEntity containing a list of OrderViewModel or an error response
+     */
     public ResponseEntity<ApiResponse<List<OrderViewModel>>> getOrdersByUserId(int userId, boolean fetchAll) {
 
         ResponseEntity<ApiResponse<List<OrderViewModel>>> adminAccess = ApiResponse.checkAdminAccess(userId, "change order status", roleDAO);
@@ -58,7 +73,6 @@ public class OrdersPageService {
 
         List<OrderViewModel> bodyForResponse = orders.stream().map(order -> {
             OrderViewModel viewModel = new OrderViewModel();
-
             Order proxyOrder = Order.builder()
                 .id(order.getId())
                 .orderDate(order.getOrderDate())
@@ -71,7 +85,6 @@ public class OrdersPageService {
 
             List<OrderItemWithStatusViewModel> itemWithStatusList = items.stream().map(item -> {
                 OrderItemWithStatusViewModel itemWithStatus = new OrderItemWithStatusViewModel();
-
                 Product product = item.getProduct();
                 Product proxyProduct = null;
                 if (product != null) {
@@ -118,6 +131,14 @@ public class OrdersPageService {
         return ResponseEntity.status(HttpStatus.OK).body(new ApiResponse<>(true, bodyForResponse, null));
     }
     
+
+    /**
+     * Updates the status of an order item, if the user is authorized and the status transition is valid.
+     * @param userId The ID of the user performing the update
+     * @param orderItemId The ID of the order item to update
+     * @param newStatus The new status to set
+     * @return ResponseEntity containing the updated status view model or an error response
+     */
     @Transactional
     public ResponseEntity<ApiResponse<OrderItemWithStatusViewModel.StatusViewModel>> updateOrderItemStatus(int userId, int orderItemId, OrderItemStatus.Status newStatus) {
         ResponseEntity<ApiResponse<OrderItemStatus>> accessCheck = ApiResponse.checkAdminAccess(userId, "update order item status", roleDAO);
@@ -164,6 +185,13 @@ public class OrdersPageService {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+
+    /**
+     * Determines the next valid status transitions for an order item, based on current status and user role.
+     * @param currentStatus The current status of the order item
+     * @param isAdmin Whether the user is an admin
+     * @return List of valid next statuses
+     */
     private List<OrderItemStatus.Status> determineNextSteps(OrderItemStatus.Status currentStatus, boolean isAdmin) {
         if (isAdmin) {
             // Admins can choose any status

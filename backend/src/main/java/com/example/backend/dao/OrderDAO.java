@@ -8,5 +8,10 @@ import java.util.List;
 
 @Repository
 public interface OrderDAO extends JpaRepository<Order, Integer> {
+    /**
+     * Finds all orders for a given user ID.
+     * @param userId The ID of the user
+     * @return List of Order objects for the user
+     */
     List<Order> findByUserId(int userId);
 }

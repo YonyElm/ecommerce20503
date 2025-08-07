@@ -11,10 +11,19 @@ import java.util.List;
 
 @Repository
 public interface OrderItemStatusDAO extends JpaRepository<OrderItemStatus, Integer> {
-    // Get only the LATEST status for a given order item
+    /**
+     * Finds the latest status for a given order item by order of update time.
+     * @param orderItemId The ID of the order item
+     * @return The latest OrderItemStatus for the order item
+     */
     OrderItemStatus findTopByOrderItemIdOrderByUpdatedAtDesc(int orderItemId);
 
-    // Get only the LATEST status for each order_item_id (Assuming latest ID indicates latest INSERT time)
+    /**
+     * Finds the latest eligible statuses for update for each order item, filtered by status and cutoff time.
+     * @param eligibleStatuses List of statuses that are eligible for update
+     * @param cutoffTimestamp The cutoff LocalDateTime for status update
+     * @return List of OrderItemStatus objects eligible for update
+     */
     @Query("SELECT ois FROM OrderItemStatus ois WHERE ois.id IN (" +
             "    SELECT MAX(ois2.id) FROM OrderItemStatus ois2 GROUP BY ois2.orderItem.id" +
             ") AND ois.status IN :eligibleStatuses " + // Filter by statuses that can still change

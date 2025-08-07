@@ -22,6 +22,16 @@ public class PlaceOrderService {
     @PersistenceContext
     private EntityManager entityManager;
 
+
+    /**
+     * Constructor for PlaceOrderService.
+     * @param orderDAO DAO for order data access
+     * @param orderItemDAO DAO for order item data access
+     * @param orderItemStatusDAO DAO for order item status data access
+     * @param inventoryDAO DAO for inventory data access
+     * @param shoppingCartDAO DAO for shopping cart data access
+     * @param cartItemDAO DAO for cart item data access
+     */
     @Autowired
     public PlaceOrderService(OrderDAO orderDAO, OrderItemDAO orderItemDAO, OrderItemStatusDAO orderItemStatusDAO, InventoryDAO inventoryDAO, ShoppingCartDAO shoppingCartDAO, CartItemDAO cartItemDAO) {
         this.orderDAO = orderDAO;
@@ -32,6 +42,13 @@ public class PlaceOrderService {
         this.cartItemDAO = cartItemDAO;
     }
 
+
+    /**
+     * Places an order for all items in the user's cart, updates inventory, and sets order status.
+     * @param userId The ID of the user placing the order
+     * @param addressId The ID of the shipping address
+     * @param paymentId The ID of the payment method
+     */
     @Transactional
     public void placeCartOrder(int userId,int addressId, int paymentId) {
         User user = entityManager.getReference(User.class, userId);
@@ -76,6 +93,15 @@ public class PlaceOrderService {
         }
     }
 
+
+    /**
+     * Places a "Buy It Now" order for a single product, updates inventory, and sets order status.
+     * @param userId The ID of the user placing the order
+     * @param addressId The ID of the shipping address
+     * @param paymentId The ID of the payment method
+     * @param productId The ID of the product to buy
+     * @param quantity The quantity to purchase
+     */
     @Transactional
     public void placeBuyItNowOrder(int userId, int addressId, int paymentId, int productId, int quantity) {
         User user = entityManager.getReference(User.class, userId);
