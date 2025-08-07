@@ -1,6 +1,7 @@
 package com.example.backend.dao;
 
 import com.example.backend.model.User;
+import lombok.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
