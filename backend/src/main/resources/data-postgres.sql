@@ -24,21 +24,47 @@ ON CONFLICT DO NOTHING;
 INSERT INTO categories (id, name, description)
 VALUES
     (1, 'Books', 'Fiction, non-fiction, academic books'),
-    (2, 'Electronics', 'Devices and accessories')
+    (2, 'Electronics', 'Devices and accessories'),
+    (3, 'Home Goods', 'Items for the house and garden'),
+    (4, 'Clothing & Apparel', 'Fashion, accessories, and wear')
 ON CONFLICT DO NOTHING;
 
 -- Insert products
 INSERT INTO products (id, name, description, price, category_id, seller_id, image_url, is_active)
 VALUES
     (1, 'Java 7th Edition', 'A book about Java Programming Language', 42.50, 1, 1, '/product_assets/java_7th_1.jpeg', TRUE),
-    (2, 'Headphones', 'Over-ear headphones', 199.99, 2, 1, '/product_assets/headphones_1.jpeg', TRUE)
+    (2, 'Headphones', 'Over-ear headphones', 199.99, 2, 1, '/product_assets/headphones_1.jpeg', TRUE),
+    (3, 'Advanced Python Guide', 'A comprehensive guide to advanced Python programming', 55.00, 1, 1, '/product_assets/python_book.jpeg', TRUE),
+    (4, 'The Art of Cooking', 'Recipe book for culinary enthusiasts', 30.00, 1, 1, '/product_assets/cooking_book.jpeg', TRUE),
+    (5, 'Space Exploration History', 'A journey through the history of space exploration', 25.00, 1, 1, '/product_assets/space_book.jpeg', TRUE),
+    (6, 'Introduction to AI', 'Fundamental concepts of Artificial Intelligence', 48.00, 1, 1, '/product_assets/ai_book.jpeg', TRUE),
+    (7, 'Classic Literature Anthology', 'Collection of timeless literary works', 35.00, 1, 1, '/product_assets/classic_lit.jpeg', TRUE),
+    (8, 'Wireless Earbuds', 'Noise-cancelling earbuds with long battery life', 79.99, 2, 1, '/product_assets/earbuds.jpeg', TRUE),
+    (9, 'Smartwatch', 'Fitness tracker and notification hub', 120.00, 2, 1, '/product_assets/smartwatch.jpeg', TRUE),
+    (10, 'Portable Bluetooth Speaker', 'Compact speaker with powerful sound', 45.00, 2, 1, '/product_assets/bluetooth_speaker.jpeg', TRUE),
+    (11, 'USB-C Hub', 'Multi-port adapter for modern laptops', 29.99, 2, 1, '/product_assets/usbc_hub.jpeg', TRUE),
+    (12, 'Gaming Mouse', 'High-precision gaming mouse with customizable RGB', 60.00, 2, 1, '/product_assets/gaming_mouse.jpeg', TRUE),
+    (13, 'Coffee Maker', 'Automatic drip coffee maker with timer', 85.00, 3, 1, '/product_assets/coffee_maker.jpeg', TRUE),
+    (14, 'Air Fryer', 'Healthy cooking appliance for crispy meals', 99.99, 3, 1, '/product_assets/air_fryer.jpeg', TRUE),
+    (15, 'Smart LED Light Bulb', 'Dimmable smart bulb with color changing capabilities', 15.00, 3, 1, '/product_assets/smart_bulb.jpeg', TRUE),
+    (16, 'Robotic Vacuum Cleaner', 'Automated vacuum with smart mapping', 250.00, 3, 1, '/product_assets/robot_vacuum.jpeg', TRUE),
+    (17, 'Blender', 'High-speed blender for smoothies and shakes', 70.00, 3, 1, '/product_assets/blender.jpeg', TRUE),
+    (18, 'Men''s Casual T-Shirt', 'Comfortable cotton t-shirt for everyday wear', 20.00, 4, 1, '/product_assets/men_shirt.jpeg', TRUE),
+    (19, 'Women''s Jeans', 'Classic fit jeans', 50.00, 4, 1, '/product_assets/women_jeans.jpeg', TRUE),
+    (20, 'Unisex Hoodie', 'Warm and stylish hoodie with front pocket', 40.00, 4, 1, '/product_assets/unisex_hoodie.jpeg', TRUE),
+    (21, 'Running Shoes', 'Lightweight athletic shoes for jogging', 85.00, 4, 1, '/product_assets/running_shoes.jpeg', TRUE),
+    (22, 'Winter Scarf', 'Soft wool scarf for cold weather', 25.00, 4, 1, '/product_assets/winter_scarf.jpeg', TRUE)
 ON CONFLICT DO NOTHING;
 
 -- Insert inventory
 INSERT INTO inventory (product_id, quantity)
 VALUES
     (1, 10),
-    (2, 5)
+    (2, 5),
+    (3, 15), (4, 20), (5, 12), (6, 18), (7, 25),
+    (8, 30), (9, 10), (10, 40), (11, 50), (12, 15),
+    (13, 8), (14, 11), (15, 60), (16, 5), (17, 13),
+    (18, 100), (19, 70), (20, 80), (21, 25), (22, 35)
 ON CONFLICT DO NOTHING;
 
 -- Insert shopping cart
