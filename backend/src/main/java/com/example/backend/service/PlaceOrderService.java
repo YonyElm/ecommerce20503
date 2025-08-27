@@ -66,18 +66,22 @@ public class PlaceOrderService {
         order = orderDAO.save(order);
 
         for (CartItem cartItem : cartItems) {
+            Product product = cartItem.getProduct();
+            int productId = product != null ? product.getId() : -1;
+            if (product == null || !product.getIsActive()) {
+                throw new RuntimeException("Product is not longer available: " + productId);
+            }
             OrderItem orderItem = new OrderItem();
             orderItem.setOrder(order);
-            orderItem.setProduct(cartItem.getProduct());
+            orderItem.setProduct(product);
             orderItem.setQuantity(cartItem.getQuantity());
             orderItem.setPricePerUnit(cartItem.getProduct().getPrice().doubleValue());
             orderItem = orderItemDAO.save(orderItem);
 
-            // TBD: Inventory should fail when not enough stock
             Inventory inventory = inventoryDAO.findByProductId(cartItem.getProduct().getId())
-                    .orElseThrow(() -> new RuntimeException("Inventory not found for product id: " + cartItem.getProduct().getId()));
+                    .orElseThrow(() -> new RuntimeException("Inventory not found for product id: " + productId));
             if (inventory == null || inventory.getQuantity() < cartItem.getQuantity()) {
-                throw new RuntimeException("Not enough inventory for product " + cartItem.getProduct().getId());
+                throw new RuntimeException("Not enough inventory for product " + productId);
             } else {
                 inventory.setQuantity(inventory.getQuantity() - cartItem.getQuantity());
                 inventoryDAO.save(inventory);
