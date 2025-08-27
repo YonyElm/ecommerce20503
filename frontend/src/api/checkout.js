@@ -1,6 +1,6 @@
 import axios from "axios";
 import { API_BASE } from "./axios";
-import {isNumberString} from "../utils/ApiValidator";
+import {isNumberString, isPositiveInteger} from "../utils/ApiValidator";
 
 /**
  * Fetches the checkout page data for a specific user.
@@ -27,7 +27,7 @@ export async function getCheckoutDetailsByUserId(userId) {
  * @returns {Promise} Promise resolving to the created order
  */
 export async function placeCartOrder(userId, addressId, paymentId) {
-    if (!isNumberString(userId) || !isNumberString(addressId) || !isNumberString(paymentId)) {
+    if (!isNumberString(userId) || !isPositiveInteger(addressId) || !isPositiveInteger(paymentId)) {
         throw new Error("Invalid input: userId, addressId, and paymentId must be non-null, positive number strings.");
     }
     return axios.post(`${API_BASE}/checkout/cart`, {
@@ -51,7 +51,7 @@ export async function placeCartOrder(userId, addressId, paymentId) {
  * @returns {Promise} Promise resolving to the created order
  */
 export async function placeBuyItNowOrder(userId, addressId, paymentId, productId, quantity) {
-    if (!isNumberString(userId) || !isNumberString(addressId) || !isNumberString(paymentId)
+    if (!isNumberString(userId) || !isPositiveInteger(addressId) || !isPositiveInteger(paymentId)
         || !isNumberString(productId)) {
         throw new Error("Invalid input: userId, addressId, paymentId, productId and quantity must be non-null, positive number strings.");
     }

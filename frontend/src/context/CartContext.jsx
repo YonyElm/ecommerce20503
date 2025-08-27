@@ -14,6 +14,8 @@ export const CartProvider = ({ children }) => {
         return stored ? JSON.parse(stored) : [];
     });
     const [isLoading, setIsLoading] = useState(true);
+    const [checkoutError, setCheckoutError] = useState(null);
+
 
     // Sync to localStorage whenever cartItems changes, and user is not logged in
     useEffect(() => {
@@ -24,6 +26,7 @@ export const CartProvider = ({ children }) => {
 
     const submitPlaceOrderForm = async (e, selectedAddressId, selectedPaymentId, productId, totalItems, navigate) => {
         e.preventDefault();
+        setCheckoutError(null);
         setIsLoading(true);
         try {
             // If productId is provided, it means this is a "Buy Now" action
@@ -35,6 +38,7 @@ export const CartProvider = ({ children }) => {
             navigate("/orders");
         } catch (err) {
             console.error("Failed placing cart order", err);
+            setCheckoutError("Error, Please make sure all items are in stock and try again.");
         } finally {
             setIsLoading(false);
         }
@@ -124,7 +128,8 @@ export const CartProvider = ({ children }) => {
     };
 
     return (
-        <CartContext.Provider value={{ cartItems, removeItem, updateQuantity, addItem, submitPlaceOrderForm }}>
+        <CartContext.Provider value={{ cartItems, removeItem, updateQuantity, addItem,
+            submitPlaceOrderForm, checkoutError, setCheckoutError }}>
             {children}
         </CartContext.Provider>
     );

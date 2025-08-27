@@ -11,12 +11,17 @@ const CheckoutContext = () => {
   const { productId } = useParams();
   const location = useLocation();
   const navigate = useNavigate();
-  const { cartItems, submitPlaceOrderForm } = useContext(CartContext);
+  const { cartItems, submitPlaceOrderForm, checkoutError, setCheckoutError } = useContext(CartContext);
 
   // --- Buy now/URL queries ---
   const query = new URLSearchParams(location.search);
   const buyNowPrice = Number(query.get("price") || -1);
   const buyNowQuantity = Number(query.get("quantity") || -1);
+
+  // --- Checkout lists fetch ---
+  const [shippingAddressList, setShippingAddressList] = useState([]);
+  const [paymentMethodList, setPaymentMethodList] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   // --- Auth protection and redirect ---
   useEffect(() => {
@@ -28,13 +33,9 @@ const CheckoutContext = () => {
     }
   }, [authContext.user, authContext.loading, navigate, productId, buyNowPrice, buyNowQuantity]);
 
-  // --- Checkout lists fetch ---
-  const [shippingAddressList, setShippingAddressList] = useState([]);
-  const [paymentMethodList, setPaymentMethodList] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-
   useEffect(() => {
     setIsLoading(true);
+    setCheckoutError(null);
     if (!authContext.loading && (!authContext.user || !authContext.user.sub)) {
       setShippingAddressList([]);
       setPaymentMethodList([]);
@@ -53,7 +54,8 @@ const CheckoutContext = () => {
           console.error("Error loading checkout data", err);
           setShippingAddressList([]);
           setPaymentMethodList([]);
-        }).finally(() => setIsLoading(false));
+        })
+        .finally(() => setIsLoading(false));
     }
   }, [authContext.user, authContext.loading]);
 
@@ -78,7 +80,8 @@ const CheckoutContext = () => {
     totalItems,
     totalPrice,
     productId,
-    submitPlaceOrderForm
+    submitPlaceOrderForm,
+    checkoutError
   };
 };
 

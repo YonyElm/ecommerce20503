@@ -3,7 +3,6 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import DetailPage from "./pages/DetailPage";
-import PrivateRoute from "./components/PrivateRoute";
 import Navbar from "./components/NavBar";
 import './App.css';
 import Footer from "./components/Footer";
@@ -34,9 +33,6 @@ function App() {
                         <Route path="/checkout/:productId" element={<CheckoutPage />} />
                         <Route path="/orders" element={<OrdersPage adminFlag={false} />} />
                         <Route path="/admin" element={<AdminPage />} />
-                        <Route element={<PrivateRoute />}>
-                            {/* Protected routes go here */}
-                        </Route>
                     </Routes>
                 </main>
                 <Footer />
