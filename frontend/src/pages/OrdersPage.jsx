@@ -8,7 +8,7 @@ function OrdersPage(adminFlag) {
   const { orders, loading, triggerOrdersRefresh} = OrdersContext(adminFlag);
 
   return (
-    <PageContainer title="Your Orders" loading={loading}>
+    <PageContainer title={adminFlag.adminFlag === true ? "Manage Orders":"Your Orders"} loading={loading}>
       {!orders.length ? (
         <NotFound message="No orders found." />
       ) : (
